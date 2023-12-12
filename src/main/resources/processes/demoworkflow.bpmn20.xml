@@ -1,39 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--<definitions-->
-<!--        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"-->
-<!--        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
-<!--        xmlns:xsd="http://www.w3.org/2001/XMLSchema"-->
-<!--        xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"-->
-<!--        xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"-->
-<!--        xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"-->
-<!--        xmlns:flowable="http://flowable.org/bpmn"-->
-<!--        typeLanguage="http://www.w3.org/2001/XMLSchema"-->
-<!--        expressionLanguage="http://www.w3.org/1999/XPath"-->
-<!--        targetNamespace="http://www.flowable.org/processdef">-->
-<!--    <process id="demo" name="A simple process for demo." isExecutable="true">-->
-<!--        <startEvent id="start" />-->
-<!--        <endEvent id="end" />-->
-
-<!--        <sequenceFlow sourceRef="start" targetRef="loadData" />-->
-<!--        <sequenceFlow sourceRef="loadData" targetRef="sendMail" />-->
-<!--        <sequenceFlow sourceRef="sendMail" targetRef="end" />-->
-
-<!--        <serviceTask id="loadData" name="Load data for scan."-->
-<!--                     flowable:class="com.trustwave.dbpworkflow.task.LoadDataTask" />-->
-
-<!--        <serviceTask id="sendMail" name="Send out scanned email"-->
-<!--                     flowable:class="com.trustwave.dbpworkflow.task.SendMailTask" />-->
-<!--    </process>-->
 <definitions
         xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:flowable="http://flowable.org/bpmn"
-        targetNamespace="Examples">
+        targetNamespace="http://www.flowable.org/processdef">
+    <process id="demo" name="A simple process for demo." isExecutable="true">
+        <startEvent id="start" />
+        <endEvent id="end" />
 
-    <process id="oneTaskProcess" name="The One Task Process">
-        <startEvent id="theStart" />
-        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
-        <userTask id="theTask" name="my task" flowable:assignee="kermit" />
-        <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
-        <endEvent id="theEnd" />
+        <sequenceFlow sourceRef="start" targetRef="selectSynchronizationLevel" />
+
+        <exclusiveGateway id="selectSynchronizationLevel" />
+        <sequenceFlow sourceRef="selectSynchronizationLevel" targetRef="synchronizeKbService">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${approved}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <serviceTask id="synchronizeKbService" name="Publishes policy and check mods"
+                     flowable:class="com.trustwave.dbpworkflow.check.SynchronizeKbServiceAction" />
+        <sequenceFlow sourceRef="synchronizeKbService" targetRef="end" />
     </process>
+<!--<definitions-->
+<!--        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"-->
+<!--        xmlns:flowable="http://flowable.org/bpmn"-->
+<!--        targetNamespace="Examples">-->
+
+<!--    <process id="oneTaskProcess" name="The One Task Process">-->
+<!--        <startEvent id="theStart" />-->
+<!--        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />-->
+<!--        <userTask id="theTask" name="my task" flowable:assignee="kermit" />-->
+<!--        <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />-->
+<!--        <endEvent id="theEnd" />-->
+<!--    </process>-->
 </definitions>

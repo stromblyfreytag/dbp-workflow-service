@@ -15,13 +15,8 @@
  */
 package com.trustwave.dbpworkflow.check;
 
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * -- TODO add description here
@@ -33,17 +28,8 @@ import lombok.Setter;
  *
  * @author sfreytag
  */
-@NoArgsConstructor
-@Getter
-@Setter
-public class PolicyListToCheckSetsAction implements JavaDelegate {
-    private Expression task;
-
+public class InvalidAssetThrottler implements JavaDelegate {
     public void execute(DelegateExecution execution) {
-        System.out.println("PolicyListToCheckSetsAction Action. Task="+task.getExpressionText());
-    }
-
-    public void setTask(Expression task) {
-        this.task = task;
+        System.out.println("InvalidAssetThrottler Action");
     }
 }

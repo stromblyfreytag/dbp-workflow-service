@@ -1,5 +1,8 @@
 package com.trustwave.dbpworkflow;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -28,7 +31,10 @@ public class DbpWorkflowApplication {
 			@Override
 			public void run(String... strings) throws Exception {
 				System.out.println("Number of tasks : " + taskService.createTaskQuery().count());
-				runtimeService.startProcessInstanceByKey("demo");
+				Map<String, Object> processVariables = new HashMap<>();
+				processVariables.put("syncExceptions", Boolean.FALSE);
+				processVariables.put("taskFailed", Boolean.FALSE);
+				runtimeService.startProcessInstanceByKey("demo", processVariables);
 				System.out.println("Number of tasks after process start: "
 						+ taskService.createTaskQuery().count());
 			}

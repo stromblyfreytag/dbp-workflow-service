@@ -13,12 +13,13 @@
  * MODIFICATION, OR DISTRIBUTION OF PROGRAMS OR FILES CREATED FROM,
  * BASED ON, AND/OR DERIVED FROM THIS SOURCE CODE FILE.
  */
-package com.trustwave.dbpworkflow.check;
+package com.trustwave.dbpworkflow.task;
 
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,16 +35,13 @@ import lombok.Setter;
  * @author sfreytag
  */
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-public class PolicyListToCheckSetsAction implements JavaDelegate {
+public class RunEtlAction implements JavaDelegate {
     private Expression task;
 
     public void execute(DelegateExecution execution) {
-        System.out.println("PolicyListToCheckSetsAction Action. Task="+task.getExpressionText());
-    }
-
-    public void setTask(Expression task) {
-        this.task = task;
+        System.out.println("RunEtlAction Action");
     }
 }

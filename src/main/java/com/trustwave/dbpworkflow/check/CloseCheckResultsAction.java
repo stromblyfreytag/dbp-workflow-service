@@ -32,6 +32,11 @@ import com.trustwave.dbpworkflow.asset.AssetAction;
  */
 public class CloseCheckResultsAction extends AssetAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
-        System.out.println("CloseCheckResultsAction Action");
+        super.execute(execution);
+    }
+
+    @Override
+    protected String getActionName() {
+       return getClass().getSimpleName();
     }
 }

@@ -13,7 +13,7 @@
  * MODIFICATION, OR DISTRIBUTION OF PROGRAMS OR FILES CREATED FROM,
  * BASED ON, AND/OR DERIVED FROM THIS SOURCE CODE FILE.
  */
-package com.trustwave.dbpworkflow.check;
+package com.trustwave.dbpworkflow.task;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -28,8 +28,14 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class ForceEtlRunAction implements JavaDelegate {
+public class ErrorAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
-        System.out.println("ForceEtlRunAction Action");
+        super.execute(execution);
+        System.err.println("Hey, the previous task failed.  Here's then name: "+execution.getParent().getEventName());
+    }
+
+    @Override
+    protected String getActionName() {
+        return getClass().getSimpleName();
     }
 }

@@ -18,7 +18,7 @@ package com.trustwave.dbpworkflow.check;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
-import com.trustwave.dbpworkflow.asset.AssetAction;
+import com.trustwave.dbpworkflow.task.BaseAction;
 
 /**
  * -- TODO add description here
@@ -30,7 +30,7 @@ import com.trustwave.dbpworkflow.asset.AssetAction;
  *
  * @author sfreytag
  */
-public class RunChecksAction extends AssetAction implements JavaDelegate {
+public class LoadUserDictionariesAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         super.execute(execution);
     }

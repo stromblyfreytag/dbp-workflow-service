@@ -28,8 +28,13 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class AuditAction implements JavaDelegate {
+public class AuditAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
-        System.out.println("Audit Action");
+        super.execute(execution);
+    }
+
+    @Override
+    protected String getActionName() {
+        return this.getClass().getSimpleName();
     }
 }

@@ -13,12 +13,16 @@
  * MODIFICATION, OR DISTRIBUTION OF PROGRAMS OR FILES CREATED FROM,
  * BASED ON, AND/OR DERIVED FROM THIS SOURCE CODE FILE.
  */
-package com.trustwave.dbpworkflow.check;
+package com.trustwave.dbpworkflow.asset;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
-import com.trustwave.dbpworkflow.asset.AssetAction;
+import com.trustwave.dbpworkflow.task.BaseAction;
 
 /**
  * -- TODO add description here
@@ -30,13 +34,14 @@ import com.trustwave.dbpworkflow.asset.AssetAction;
  *
  * @author sfreytag
  */
-public class RunChecksAction extends AssetAction implements JavaDelegate {
+public class ApplyValidatorsAction extends AssetAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         super.execute(execution);
     }
 
     @Override
     protected String getActionName() {
-        return getClass().getSimpleName();
+        return this.getClass().getSimpleName();
     }
+
 }

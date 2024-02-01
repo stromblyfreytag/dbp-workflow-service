@@ -28,8 +28,13 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class FormatDateTimeAction implements JavaDelegate {
+public class FormatDateTimeAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         System.out.println("FormatDateTimeAction Action");
+    }
+
+    @Override
+    protected String getActionName() {
+        return getClass().getSimpleName();
     }
 }

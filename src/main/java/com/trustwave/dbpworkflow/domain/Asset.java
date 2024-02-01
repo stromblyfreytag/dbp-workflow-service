@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Trustwave Holdings, Inc.
+ * Copyright (c) 2024 Trustwave Holdings, Inc.
  * All Rights Reserved.
  *
  * This software is the confidential and proprietary information
@@ -13,30 +13,17 @@
  * MODIFICATION, OR DISTRIBUTION OF PROGRAMS OR FILES CREATED FROM,
  * BASED ON, AND/OR DERIVED FROM THIS SOURCE CODE FILE.
  */
-package com.trustwave.dbpworkflow.check;
-
-import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.JavaDelegate;
-
-import com.trustwave.dbpworkflow.asset.AssetAction;
+package com.trustwave.dbpworkflow.domain;
 
 /**
  * -- TODO add description here
  *
  * <pre>
- * Copyright (c) 2023 Trustwave Holdings, Inc.
+ * Copyright (c) 2024 Trustwave Holdings, Inc.
  * All rights reserved.
  * </pre>
  *
  * @author sfreytag
  */
-public class RunChecksAction extends AssetAction implements JavaDelegate {
-    public void execute(DelegateExecution execution) {
-        super.execute(execution);
-    }
-
-    @Override
-    protected String getActionName() {
-        return getClass().getSimpleName();
-    }
+public class Asset {
 }

@@ -13,7 +13,7 @@
  * MODIFICATION, OR DISTRIBUTION OF PROGRAMS OR FILES CREATED FROM,
  * BASED ON, AND/OR DERIVED FROM THIS SOURCE CODE FILE.
  */
-package com.trustwave.dbpworkflow.check;
+package com.trustwave.dbpworkflow.task;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -28,8 +28,8 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class InvalidAssetThrottler implements JavaDelegate {
+public class CollectOperationalDataAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
-        System.out.println("InvalidAssetThrottler Action");
+        System.out.println("Action: "+getClass().getSimpleName());
     }
 }

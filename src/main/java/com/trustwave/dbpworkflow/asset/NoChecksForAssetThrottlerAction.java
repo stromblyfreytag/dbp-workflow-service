@@ -13,10 +13,14 @@
  * MODIFICATION, OR DISTRIBUTION OF PROGRAMS OR FILES CREATED FROM,
  * BASED ON, AND/OR DERIVED FROM THIS SOURCE CODE FILE.
  */
-package com.trustwave.dbpworkflow.check;
+package com.trustwave.dbpworkflow.asset;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.common.engine.api.delegate.Expression;
 
 /**
  * -- TODO add description here
@@ -28,8 +32,13 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class LoadUserDictionariesAciton implements JavaDelegate {
+public class NoChecksForAssetThrottlerAction extends AssetAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
-        System.out.println("LoadUserDictionariesAciton Action");
+        super.execute(execution);
+    }
+
+    @Override
+    protected String getActionName() {
+        return getClass().getSimpleName();
     }
 }

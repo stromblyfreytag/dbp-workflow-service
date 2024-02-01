@@ -35,13 +35,17 @@ import lombok.Setter;
  * @author sfreytag
  */
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-public class RunEtlAction implements JavaDelegate {
-    private Expression task;
+public class RunEtlAction extends BaseAction implements JavaDelegate {
+    private Expression etlEventId;
 
     public void execute(DelegateExecution execution) {
-        System.out.println("RunEtlAction Action");
+        super.execute(execution);
+    }
+
+    @Override
+    protected String getActionName() {
+        return getClass().getSimpleName() + ": " + (task == null ? "" : task.getExpressionText());
     }
 }

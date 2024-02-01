@@ -15,8 +15,12 @@
  */
 package com.trustwave.dbpworkflow.task;
 
+import java.util.ArrayList;
+
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
+
+import com.trustwave.dbpworkflow.domain.Asset;
 
 /**
  * -- TODO add description here
@@ -31,6 +35,12 @@ import org.flowable.engine.delegate.JavaDelegate;
 public class LoadJobPropertiesAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         execution.setVariable("syncExceptions", Boolean.TRUE);
-        System.out.println("LoadJobPropertiesAction Action");
+        execution.setVariable("failed", Boolean.FALSE);
+        execution.setVariable("BestEffortJobExecution", Boolean.FALSE);
+        execution.setVariable("collectJobDataAfterWarehousing", Boolean.TRUE);
+        execution.setVariable("successCount", 0L);
+        execution.setVariable("reportCount", 0L);
+        execution.setVariable("assets", new ArrayList<Asset>());
+        System.out.println("Action: "+getClass().getSimpleName());
     }
 }

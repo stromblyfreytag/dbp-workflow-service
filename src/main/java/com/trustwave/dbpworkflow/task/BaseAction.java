@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Trustwave Holdings, Inc.
+ * Copyright (c) 2024 Trustwave Holdings, Inc.
  * All Rights Reserved.
  *
  * This software is the confidential and proprietary information
@@ -13,35 +13,45 @@
  * MODIFICATION, OR DISTRIBUTION OF PROGRAMS OR FILES CREATED FROM,
  * BASED ON, AND/OR DERIVED FROM THIS SOURCE CODE FILE.
  */
-package com.trustwave.dbpworkflow.asset;
+package com.trustwave.dbpworkflow.task;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.JavaDelegate;
-
-import com.trustwave.dbpworkflow.task.BaseAction;
 
 /**
  * -- TODO add description here
  *
  * <pre>
- * Copyright (c) 2023 Trustwave Holdings, Inc.
+ * Copyright (c) 2024 Trustwave Holdings, Inc.
  * All rights reserved.
  * </pre>
  *
  * @author sfreytag
  */
-abstract public class AssetAction extends BaseAction implements JavaDelegate {
-    private Expression asset;
+abstract public class BaseAction {
+    protected Expression task;
+    protected List<Expression> valuePresent = new ArrayList<>();
 
     public void execute(DelegateExecution execution) {
-        super.execute(execution);
-        if (asset != null) {
-            System.out.println(getActionName() + " asset=" + asset.getExpressionText());
+        System.out.println("Action: "+getActionName());
+        if (task != null) {
+            System.out.println("   task: " + task.getExpressionText());
         }
+        valuePresent.forEach(v ->
+                System.out.println("   valuePresent: "+v.getExpressionText())
+        );
     }
 
-    public void setAsset(Expression asset) {
-        this.asset = asset;
+    public void setTask(Expression task) {
+        this.task = task;
     }
+
+    public void setValuePresent(Expression valuePresent) {
+        this.valuePresent.add(valuePresent);
+    }
+
+    abstract protected String getActionName() ;
 }

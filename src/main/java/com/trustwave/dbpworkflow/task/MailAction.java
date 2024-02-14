@@ -30,6 +30,14 @@ import org.flowable.engine.delegate.JavaDelegate;
  */
 public class MailAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
-        System.out.println("MailAction Action");
+        String processInstanceId = execution.getProcessInstanceId();
+        String processInstanceBusinessKey = execution.getProcessInstanceBusinessKey();
+        StringBuilder sb = new StringBuilder();
+        sb.append("MailAction Action.  ");
+        sb.append("processInstanceId=");
+        sb.append(processInstanceId);
+        sb.append(", processInstanceBusinessKey=");
+        sb.append(processInstanceBusinessKey);
+        System.out.println(sb.toString());
     }
 }

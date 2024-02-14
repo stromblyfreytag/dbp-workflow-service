@@ -28,8 +28,13 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class CollectOperationalDataAction implements JavaDelegate {
+public class CollectOperationalDataAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
-        System.out.println("Action: "+getClass().getSimpleName());
+        super.execute(execution);
+    }
+
+    @Override
+    protected String getActionName() {
+        return this.getClass().getSimpleName();
     }
 }

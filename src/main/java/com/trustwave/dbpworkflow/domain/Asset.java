@@ -15,6 +15,13 @@
  */
 package com.trustwave.dbpworkflow.domain;
 
+import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 /**
  * -- TODO add description here
  *
@@ -25,5 +32,11 @@ package com.trustwave.dbpworkflow.domain;
  *
  * @author sfreytag
  */
-public class Asset {
+@Getter
+@Setter
+@ToString
+@AllArgsConstructor
+public class Asset implements Serializable {
+    private String id;
+
 }

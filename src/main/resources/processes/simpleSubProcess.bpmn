@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-work-process-palette">
+  <process id="simpleSubProcess" name="SimpleSubProcess" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <extensionElements>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:creationdate><![CDATA[2024-02-14T16:50:16.268Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2024-02-14T17:23:42.422Z]]></design:modificationdate>
+    </extensionElements>
+    <subProcess id="bpmnStructure_8" name="Scan An Asset">
+      <extensionElements>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[ExpandedSubProcess]]></design:stencilid>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${assets}" flowable:elementVariable="asset">
+        <extensionElements></extensionElements>
+      </multiInstanceLoopCharacteristics>
+      <serviceTask id="simpleServiceTask" name="Simple Service task" flowable:expression="print('Hello:' + ${asset});">
+        <extensionElements>
+          <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </serviceTask>
+      <startEvent id="subProcessStart" name="SubProcess Start" flowable:initiator="initiator" flowable:formFieldValidation="false">
+        <extensionElements>
+          <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+          <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </startEvent>
+      <endEvent id="subProcessEnd" name="SubProcess End">
+        <extensionElements>
+          <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </endEvent>
+      <sequenceFlow id="bpmnSequenceFlow_7" sourceRef="simpleServiceTask" targetRef="subProcessEnd">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_5" sourceRef="subProcessStart" targetRef="simpleServiceTask">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+    </subProcess>
+    <startEvent id="simpleStart" name="Simple Start" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="simpleEnd" name="Simple End">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="bpmnSequenceFlow_12" sourceRef="bpmnStructure_8" targetRef="simpleEnd">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_11" sourceRef="simpleStart" targetRef="bpmnStructure_8">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_simpleSubProcess">
+    <bpmndi:BPMNPlane bpmnElement="simpleSubProcess" id="BPMNPlane_simpleSubProcess">
+      <bpmndi:BPMNShape bpmnElement="bpmnStructure_8" id="BPMNShape_bpmnStructure_8">
+        <omgdc:Bounds height="439.0" width="1124.0" x="427.95762307081213" y="102.62084532299673"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="simpleServiceTask" id="BPMNShape_simpleServiceTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="670.1180154818891" y="249.51475193523618"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subProcessStart" id="BPMNShape_subProcessStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="534.5540904291992" y="265.50491731174543"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subProcessEnd" id="BPMNShape_subProcessEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="849.399978008234" y="273.26229327936346"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="simpleStart" id="BPMNShape_simpleStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="317.0" y="261.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="simpleEnd" id="BPMNShape_simpleEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="1652.3310256849682" y="345.3409702672893"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_11" id="BPMNEdge_bpmnSequenceFlow_11" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="562.0" flowable:targetDockerY="220.0">
+        <omgdi:waypoint x="347.0" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.47881153540607" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.47881153540607" y="322.12084532299673"></omgdi:waypoint>
+        <omgdi:waypoint x="427.95762307081213" y="322.1208453229968"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_12" id="BPMNEdge_bpmnSequenceFlow_12" flowable:sourceDockerX="562.0" flowable:sourceDockerY="220.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="1551.9576230708121" y="322.12084532299673"></omgdi:waypoint>
+        <omgdi:waypoint x="1602.1443243778901" y="322.12084532299673"></omgdi:waypoint>
+        <omgdi:waypoint x="1602.1443243778901" y="359.3409702672893"></omgdi:waypoint>
+        <omgdi:waypoint x="1652.3310256849682" y="359.3409702672893"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_7" id="BPMNEdge_bpmnSequenceFlow_7" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="770.118015481889" y="289.5147519352363"></omgdi:waypoint>
+        <omgdi:waypoint x="809.7589967450615" y="289.5147519352363"></omgdi:waypoint>
+        <omgdi:waypoint x="809.7589967450615" y="287.2622932793636"></omgdi:waypoint>
+        <omgdi:waypoint x="849.3999780082339" y="287.2622932793636"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_5" id="BPMNEdge_bpmnSequenceFlow_5" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="564.554090429199" y="280.50491731174554"></omgdi:waypoint>
+        <omgdi:waypoint x="617.336052955544" y="280.50491731174554"></omgdi:waypoint>
+        <omgdi:waypoint x="617.336052955544" y="289.5147519352363"></omgdi:waypoint>
+        <omgdi:waypoint x="670.118015481889" y="289.5147519352363"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

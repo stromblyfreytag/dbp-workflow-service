@@ -36,11 +36,15 @@ public class LoadJobPropertiesAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         execution.setVariable("syncExceptions", Boolean.TRUE);
         execution.setVariable("failed", Boolean.FALSE);
-        execution.setVariable("BestEffortJobExecution", Boolean.FALSE);
+        execution.setVariable("bestEffort", Boolean.FALSE);
         execution.setVariable("collectJobDataAfterWarehousing", Boolean.TRUE);
         execution.setVariable("successCount", 0L);
         execution.setVariable("reportCount", 0L);
-        execution.setVariable("assets", new ArrayList<Asset>());
+        ArrayList<Asset> value = new ArrayList<>();
+        for (int i=1; i < 4; i++) {
+            Asset asset = new Asset("asset"+i);
+        }
+        execution.setVariable("assets", value);
         System.out.println("Action: "+getClass().getSimpleName());
     }
 }

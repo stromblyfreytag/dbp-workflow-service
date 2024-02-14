@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="scan workflows" design:palette="flowable-work-process-palette">
+  <process id="scanAssetsSubProcessWorkflow" name="Scan Assets SubProcess Workflow" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <documentation>Scan a set of assets and generate reports - isolate just the subProcess</documentation>
+    <extensionElements>
+      <flowable:processInstanceName><![CDATA[AuditScanWorkflow]]></flowable:processInstanceName>
+      <flowable:processInstanceBusinessKey><![CDATA[DBP]]></flowable:processInstanceBusinessKey>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:creationdate><![CDATA[2024-02-14T17:45:18.453Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2024-02-14T17:48:32.646Z]]></design:modificationdate>
+    </extensionElements>
+    <subProcess id="scanAnAssetSubprocess" name="Scan An Asset SubProcess">
+      <extensionElements>
+        <design:stencilid><![CDATA[ExpandedSubProcess]]></design:stencilid>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${assets}" flowable:elementVariable="asset">
+        <extensionElements></extensionElements>
+      </multiInstanceLoopCharacteristics>
+      <callActivity id="assetValidationCallActivity" name="Asset Validation" calledElement="auditAssetValidationWorkflow" flowable:inheritBusinessKey="true" flowable:inheritVariables="true" flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true">
+        <documentation>Validates the Asset</documentation>
+        <extensionElements>
+          <flowable:out source="failure" target="failure"></flowable:out>
+          <flowable:out source="errors" target="errors"></flowable:out>
+          <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+          <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
+        </extensionElements>
+      </callActivity>
+      <callActivity id="assetValidationFailureEmailCallActivity" name="Email User" calledElement="auditMailWorkflow" flowable:inheritBusinessKey="true" flowable:inheritVariables="true" flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true">
+        <extensionElements>
+          <flowable:out source="retry" target="retry"></flowable:out>
+          <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+          <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
+        </extensionElements>
+      </callActivity>
+      <callActivity id="assetScanCallActivity" name="Asset Scan" calledElement="auditScannerWorkflow" flowable:inheritBusinessKey="true" flowable:inheritVariables="true" flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true">
+        <extensionElements>
+          <flowable:out source="failure" target="failure"></flowable:out>
+          <flowable:out source="errors" target="errors"></flowable:out>
+          <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+          <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
+        </extensionElements>
+      </callActivity>
+      <callActivity id="scanFailureEmailCallActivity" name="Email user" calledElement="auditMailWorkflow" flowable:inheritBusinessKey="true" flowable:inheritVariables="true" flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true">
+        <extensionElements>
+          <flowable:out source="retry" target="retry"></flowable:out>
+          <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+          <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
+        </extensionElements>
+      </callActivity>
+      <serviceTask id="bpmnTask_272" name="Temporary Collect Operational Data" flowable:class="com.trustwave.dbpworkflow.task.CollectJobInstanceDataAction">
+        <documentation>Retrieves Operational data.</documentation>
+        <extensionElements>
+          <flowable:field name="task">
+            <flowable:string><![CDATA["Operational Data Processing"]]></flowable:string>
+          </flowable:field>
+          <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </serviceTask>
+      <exclusiveGateway id="assetValidationGateway" name="validation suceessful?">
+        <extensionElements>
+          <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </exclusiveGateway>
+      <exclusiveGateway id="assetValidationRetryGateway" name="Retry or Cancel?">
+        <extensionElements>
+          <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </exclusiveGateway>
+      <exclusiveGateway id="joinPoint_185">
+        <extensionElements>
+          <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+        </extensionElements>
+      </exclusiveGateway>
+      <exclusiveGateway id="scanSuccessfulGateway" name="Scan Successful?">
+        <extensionElements>
+          <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </exclusiveGateway>
+      <exclusiveGateway id="assetScanRetryGateway" name="Retry or Cancel?">
+        <extensionElements>
+          <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </exclusiveGateway>
+      <startEvent id="scanOneAsset" name="Scan One Asset" flowable:initiator="initiator" flowable:formFieldValidation="false">
+        <extensionElements>
+          <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+          <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </startEvent>
+      <endEvent id="assetScanCanceled" name="asset scan canceled">
+        <extensionElements>
+          <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </endEvent>
+      <endEvent id="assetScanEnd" name="asset scanned">
+        <extensionElements>
+          <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </endEvent>
+      <sequenceFlow id="bpmnSequenceFlow_177" sourceRef="assetValidationCallActivity" targetRef="assetValidationGateway">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_181" sourceRef="assetValidationFailureEmailCallActivity" targetRef="assetValidationRetryGateway">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_194" sourceRef="assetScanCallActivity" targetRef="scanSuccessfulGateway">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_198" sourceRef="scanFailureEmailCallActivity" targetRef="assetScanRetryGateway">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_276" sourceRef="bpmnTask_272" targetRef="assetValidationCallActivity">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="assetValidationSuccessFlow" name="success" sourceRef="assetValidationGateway" targetRef="assetScanCallActivity">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+          <design:labelrotation><![CDATA[0]]></design:labelrotation>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!failure}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="validationFailureFlow" name="failed" sourceRef="assetValidationGateway" targetRef="assetValidationFailureEmailCallActivity">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+          <design:labelrotation><![CDATA[0]]></design:labelrotation>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${failure}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="assetValidationRetryChoice" name="retry" sourceRef="assetValidationRetryGateway" targetRef="assetValidationCallActivity">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+          <design:labelrotation><![CDATA[0]]></design:labelrotation>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${retry}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="assetValidationCancelChoice" name="cancel" sourceRef="assetValidationRetryGateway" targetRef="joinPoint_185">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+          <design:labelrotation><![CDATA[0]]></design:labelrotation>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!retry}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_208" sourceRef="joinPoint_185" targetRef="assetScanCanceled">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="assetScanFailureChoice" name="failure" sourceRef="scanSuccessfulGateway" targetRef="scanFailureEmailCallActivity">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+          <design:labelrotation><![CDATA[0]]></design:labelrotation>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${failure}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="assetScanSuccessfulFlow" name="successful" sourceRef="scanSuccessfulGateway" targetRef="assetScanEnd">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+          <design:labelrotation><![CDATA[0]]></design:labelrotation>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!failure}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="assetScanRetryChoice" name="retry" sourceRef="assetScanRetryGateway" targetRef="assetScanCallActivity">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+          <design:labelrotation><![CDATA[0]]></design:labelrotation>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${retry}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="assetScanCancelChoice" name="cancel" sourceRef="assetScanRetryGateway" targetRef="joinPoint_185">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+          <design:labelrotation><![CDATA[0]]></design:labelrotation>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!retry}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_282" sourceRef="scanOneAsset" targetRef="bpmnTask_272">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+    </subProcess>
+    <startEvent id="start" name="Scan Assets Start" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="end" name="job complete">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="bpmnSequenceFlow_296" sourceRef="scanAnAssetSubprocess" targetRef="end">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_286" sourceRef="start" targetRef="scanAnAssetSubprocess">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_scanAssetsSubProcessWorkflow">
+    <bpmndi:BPMNPlane bpmnElement="scanAssetsSubProcessWorkflow" id="BPMNPlane_scanAssetsSubProcessWorkflow">
+      <bpmndi:BPMNShape bpmnElement="scanAnAssetSubprocess" id="BPMNShape_scanAnAssetSubprocess">
+        <omgdc:Bounds height="439.0" width="1124.0" x="-85.99331377056478" y="53.9930419921875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assetValidationCallActivity" id="BPMNShape_assetValidationCallActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="264.0066862294352" y="97.02245510455708"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assetValidationFailureEmailCallActivity" id="BPMNShape_assetValidationFailureEmailCallActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="406.0066862294352" y="231.02245510455708"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assetScanCallActivity" id="BPMNShape_assetScanCallActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="595.9193830160011" y="97.02245510455708"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scanFailureEmailCallActivity" id="BPMNShape_scanFailureEmailCallActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="743.9193830160011" y="231.02245510455708"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnTask_272" id="BPMNShape_bpmnTask_272">
+        <omgdc:Bounds height="80.0" width="100.0" x="76.20000000000027" y="96.02245510455708"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assetValidationGateway" id="BPMNShape_assetValidationGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="436.0066862294352" y="117.02245510455708"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assetValidationRetryGateway" id="BPMNShape_assetValidationRetryGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="294.0066862294352" y="251.02245510455708"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="joinPoint_185" id="BPMNShape_joinPoint_185">
+        <omgdc:Bounds height="40.0" width="40.0" x="625.9193830160011" y="362.8027895772134"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scanSuccessfulGateway" id="BPMNShape_scanSuccessfulGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="773.9193830160011" y="117.02245510455708"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assetScanRetryGateway" id="BPMNShape_assetScanRetryGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="625.9193830160011" y="251.02245510455708"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scanOneAsset" id="BPMNShape_scanOneAsset">
+        <omgdc:Bounds height="30.0" width="30.0" x="-22.5" y="121.02245510455708"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assetScanCanceled" id="BPMNShape_assetScanCanceled">
+        <omgdc:Bounds height="28.0" width="28.0" x="920.1193830160009" y="368.8027895772134"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="assetScanEnd" id="BPMNShape_assetScanEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="926.519383016001" y="123.02245510455708"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="30.0" width="30.0" x="-230.00592099435065" y="258.4930419921875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+        <omgdc:Bounds height="28.0" width="28.0" x="1386.8845610785293" y="259.4930419921875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="assetScanRetryChoice" id="BPMNEdge_assetScanRetryChoice" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="645.9193830160013" y="251.02245510455708"></omgdi:waypoint>
+        <omgdi:waypoint x="645.9193830160013" y="177.02245510455708"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_177" id="BPMNEdge_bpmnSequenceFlow_177" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="364.0066862294352" y="137.02245510455714"></omgdi:waypoint>
+        <omgdi:waypoint x="436.0066862294352" y="137.02245510455714"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_276" id="BPMNEdge_bpmnSequenceFlow_276" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="176.20000000000027" y="136.02245510455708"></omgdi:waypoint>
+        <omgdi:waypoint x="220.10334311471775" y="136.02245510455708"></omgdi:waypoint>
+        <omgdi:waypoint x="220.10334311471775" y="137.02245510455708"></omgdi:waypoint>
+        <omgdi:waypoint x="264.0066862294352" y="137.02245510455708"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="validationFailureFlow" id="BPMNEdge_validationFailureFlow" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="456.0066862294352" y="157.02245510455708"></omgdi:waypoint>
+        <omgdi:waypoint x="456.0066862294352" y="231.02245510455708"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_208" id="BPMNEdge_bpmnSequenceFlow_208" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="665.9193830160013" y="382.8027895772134"></omgdi:waypoint>
+        <omgdi:waypoint x="920.1193830160009" y="382.8027895772134"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="assetValidationSuccessFlow" id="BPMNEdge_assetValidationSuccessFlow" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="476.0066862294352" y="137.02245510455708"></omgdi:waypoint>
+        <omgdi:waypoint x="595.9193830160013" y="137.02245510455708"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="assetScanCancelChoice" id="BPMNEdge_assetScanCancelChoice" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="645.9193830160013" y="291.02245510455714"></omgdi:waypoint>
+        <omgdi:waypoint x="645.9193830160013" y="362.8027895772134"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="assetValidationRetryChoice" id="BPMNEdge_assetValidationRetryChoice" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="314.0066862294352" y="251.02245510455714"></omgdi:waypoint>
+        <omgdi:waypoint x="314.0066862294352" y="177.02245510455714"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="assetScanFailureChoice" id="BPMNEdge_assetScanFailureChoice" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="793.9193830160013" y="157.02245510455714"></omgdi:waypoint>
+        <omgdi:waypoint x="793.9193830160013" y="231.02245510455714"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="assetScanSuccessfulFlow" id="BPMNEdge_assetScanSuccessfulFlow" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="813.9193830160013" y="137.02245510455714"></omgdi:waypoint>
+        <omgdi:waypoint x="926.5193830160006" y="137.02245510455714"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_296" id="BPMNEdge_bpmnSequenceFlow_296" flowable:sourceDockerX="562.0" flowable:sourceDockerY="220.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="1038.0066862294352" y="273.4930419921875"></omgdi:waypoint>
+        <omgdi:waypoint x="1386.8845610785293" y="273.4930419921875"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_198" id="BPMNEdge_bpmnSequenceFlow_198" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="743.9193830160013" y="271.02245510455714"></omgdi:waypoint>
+        <omgdi:waypoint x="665.9193830160013" y="271.02245510455714"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_286" id="BPMNEdge_bpmnSequenceFlow_286" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="562.0" flowable:targetDockerY="220.0">
+        <omgdi:waypoint x="-200.00592099435065" y="273.4930419921875"></omgdi:waypoint>
+        <omgdi:waypoint x="-85.99331377056478" y="273.49304199218756"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="assetValidationCancelChoice" id="BPMNEdge_assetValidationCancelChoice" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="314.0066862294352" y="291.02245510455714"></omgdi:waypoint>
+        <omgdi:waypoint x="314.0066862294352" y="382.8027895772134"></omgdi:waypoint>
+        <omgdi:waypoint x="625.9193830160013" y="382.8027895772134"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_181" id="BPMNEdge_bpmnSequenceFlow_181" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="406.0066862294352" y="271.0224551045571"></omgdi:waypoint>
+        <omgdi:waypoint x="334.0066862294352" y="271.0224551045571"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_194" id="BPMNEdge_bpmnSequenceFlow_194" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="695.9193830160013" y="137.02245510455714"></omgdi:waypoint>
+        <omgdi:waypoint x="773.9193830160013" y="137.02245510455708"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_282" id="BPMNEdge_bpmnSequenceFlow_282" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="7.5" y="136.02245510455708"></omgdi:waypoint>
+        <omgdi:waypoint x="76.20000000000027" y="136.02245510455708"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

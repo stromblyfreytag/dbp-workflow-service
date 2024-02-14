@@ -21,6 +21,8 @@ import java.util.List;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 
+import com.trustwave.dbpworkflow.util.RecordedExecutionListener;
+
 /**
  * -- TODO add description here
  *
@@ -36,6 +38,7 @@ abstract public class BaseAction {
     protected List<Expression> valuePresent = new ArrayList<>();
 
     public void execute(DelegateExecution execution) {
+        new RecordedExecutionListener().notify(execution);
         System.out.println("Action: "+getActionName());
         if (task != null) {
             System.out.println("   task: " + task.getExpressionText());

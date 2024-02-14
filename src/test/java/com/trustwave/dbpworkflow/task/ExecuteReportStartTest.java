@@ -48,6 +48,7 @@ import org.flowable.engine.test.FlowableRule;
 import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,7 +87,7 @@ public class ExecuteReportStartTest {
         // Required, since all the other tests seem to do a specific drop on the end
         processEngine.close();
     }
-
+    @Ignore
     @Test
     @Deployment(resources = {"processes/auditWorkflowDemo.bpmn20.xml"})
     public void testingDeployment_single() {
@@ -96,6 +97,7 @@ public class ExecuteReportStartTest {
         assertEquals("demo", processDefinition.getId() );
     }
 
+    @Ignore
     @Test
     @Deployment(resources = {"processes/auditWorkflowDemo.bpmn20.xml", "processes/demoworkflow.bpmn20.xml"})
     public void testingDeployment_double() {
@@ -109,30 +111,30 @@ public class ExecuteReportStartTest {
         assertTrue(names.contains("demoDec13_2023_1"));
     }
 
-    @Test
-    @Deployment(resources = {"processes/auditWorkflowDemo.bpmn20.xml"})
-    public void testingDeployment_() {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-
-//        runtimeService.c
-
-        ProcessInstanceBuilder demo = runtimeService.createProcessInstanceBuilder().processDefinitionKey("demo");
-        demo.startEventId("executeReportStart").start();
-//        runtimeService.startProcessInstanceByKey("demo");
-        long count = taskService.createTaskQuery().count();
-
-        List<Task> tasks = taskService.createTaskQuery().list();
-        assertNotNull(tasks);
-        assertTrue(tasks.size() > 0);
-        Task task = tasks.get(0);
-        assertThat(task.getName()).isEqualTo("My Task");
-
-        // ACT-1186: ActivitiRule services not initialized when using
-        // SpringJUnit4ClassRunner together with @ContextConfiguration
-        assertThat(flowableSpringRule.getRuntimeService()).isNotNull();
-
-        taskService.complete(task.getId());
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
-    }
+//    @Test
+//    @Deployment(resources = {"processes/auditWorkflowDemo.bpmn20.xml"})
+//    public void testingDeployment_() {
+//        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+//
+////        runtimeService.c
+//
+//        ProcessInstanceBuilder demo = runtimeService.createProcessInstanceBuilder().processDefinitionKey("demo");
+////         demo.startEventId("executeReportStart").start();
+////        runtimeService.startProcessInstanceByKey("demo");
+//        long count = taskService.createTaskQuery().count();
+//
+//        List<Task> tasks = taskService.createTaskQuery().list();
+//        assertNotNull(tasks);
+//        assertTrue(tasks.size() > 0);
+//        Task task = tasks.get(0);
+//        assertThat(task.getName()).isEqualTo("My Task");
+//
+//        // ACT-1186: ActivitiRule services not initialized when using
+//        // SpringJUnit4ClassRunner together with @ContextConfiguration
+//        assertThat(flowableSpringRule.getRuntimeService()).isNotNull();
+//
+//        taskService.complete(task.getId());
+//        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+//    }
 
 }

@@ -72,6 +72,7 @@ public class SpringJunit4Test {
 
     @Test
     @Deployment
+
     public void simpleProcessTest() {
         runtimeService.startProcessInstanceByKey("simpleProcess");
         Task task = taskService.createTaskQuery().singleResult();

@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="scan workflows" design:palette="flowable-work-process-palette">
+  <process id="auditScannerWorkflow" name="Audit Scanner Workflow" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <documentation>Scan an asset</documentation>
+    <extensionElements>
+      <flowable:processInstanceName><![CDATA[AuditScanWorkflow]]></flowable:processInstanceName>
+      <flowable:processInstanceBusinessKey><![CDATA[DBP]]></flowable:processInstanceBusinessKey>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:creationdate><![CDATA[2024-02-08T21:04:41.190Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2024-02-09T21:29:32.224Z]]></design:modificationdate>
+    </extensionElements>
+    <serviceTask id="bpmnTask_185" name="Warehousing Check Results" flowable:class="com.trustwave.dbpworkflow.task.RunEtlAction">
+      <extensionElements>
+        <flowable:field name="task">
+          <flowable:string><![CDATA[Data Warehousing]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="valuePresent">
+          <flowable:string><![CDATA[etlEventId]]></flowable:string>
+        </flowable:field>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="bpmnTask_178" name="Loading Custom Dictionaries" flowable:class="com.trustwave.dbpworkflow.check.LoadUserDictionariesAction">
+      <extensionElements>
+        <flowable:field name="task">
+          <flowable:string><![CDATA[Pre-execution Scanner Check]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="valuePresent">
+          <flowable:string><![CDATA[checkServiceUrl]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="valuePresent">
+          <flowable:string><![CDATA[checkSets]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="valuePresent">
+          <flowable:string><![CDATA[checkSetId]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="batchSize">
+          <flowable:string><![CDATA[5000]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="fileEncoding">
+          <flowable:expression><![CDATA[${fileEncoding}]]></flowable:expression>
+        </flowable:field>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="bpmnTask_180" name="Staging Results for Wharehousing" flowable:class="com.trustwave.dbpworkflow.check.RetrieveCheckResultsAction">
+      <extensionElements>
+        <flowable:field name="task">
+          <flowable:string><![CDATA[Data Transfer]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="taskNameForEtl">
+          <flowable:string><![CDATA[Audit]]></flowable:string>
+        </flowable:field>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="deleteCheckResults" name="Delete Check Results" flowable:class="com.trustwave.dbpworkflow.check.CloseCheckResultsAction">
+      <extensionElements>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="bpmnTask_181" name="Close Check Results" flowable:class="com.trustwave.dbpworkflow.check.CloseCheckResultsAction">
+      <extensionElements>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="bpmnTask_179" name="Running Audit Checks" flowable:class="com.trustwave.dbpworkflow.check.RunChecksAction">
+      <extensionElements>
+        <flowable:field name="checkType">
+          <flowable:string><![CDATA[Audit]]></flowable:string>
+        </flowable:field>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <callActivity id="emailAuditUserCallActivity" name="Email Audit User" calledElement="auditMailWorkflow" flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true">
+      <extensionElements>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
+      </extensionElements>
+    </callActivity>
+    <exclusiveGateway id="bpmnGateway_66">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+      </extensionElements>
+    </exclusiveGateway>
+    <exclusiveGateway id="bpmnGateway_190" name="Wharehouse Check Results?">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </exclusiveGateway>
+    <exclusiveGateway id="bpmnGateway_186">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+      </extensionElements>
+    </exclusiveGateway>
+    <exclusiveGateway id="bpmnGateway_205" name="BestEffort?">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </exclusiveGateway>
+    <exclusiveGateway id="retryStagingGateway" name="Retry or Cancel?">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </exclusiveGateway>
+    <exclusiveGateway id="bpmnGateway_214">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+      </extensionElements>
+    </exclusiveGateway>
+    <startEvent id="auditChecksStarted" name="Audit Checks Started" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="bpmnEndEvent_188" name="auditCheckComplete">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <endEvent id="bpmnEndEvent_211" name="auditCheckFailed">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="bpmnSequenceFlow_187" sourceRef="bpmnTask_185" targetRef="bpmnGateway_186">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_200" sourceRef="bpmnTask_178" targetRef="bpmnTask_179">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_184" sourceRef="bpmnTask_180" targetRef="bpmnGateway_66">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_218" sourceRef="deleteCheckResults" targetRef="bpmnEndEvent_211">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_191" sourceRef="bpmnTask_181" targetRef="bpmnGateway_190">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_199" sourceRef="bpmnTask_179" targetRef="bpmnTask_180">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_214" sourceRef="emailAuditUserCallActivity" targetRef="retryStagingGateway">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="stagingChecksSuccessFlow" name="success" sourceRef="bpmnGateway_66" targetRef="bpmnTask_181">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!failed}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="stagingCheckResultsFailureFlow" name="failed" sourceRef="bpmnGateway_66" targetRef="bpmnGateway_205">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${failure}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_192" name="yes" sourceRef="bpmnGateway_190" targetRef="bpmnTask_185">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${collectJobDataAfterWarehousing}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_193" name="no" sourceRef="bpmnGateway_190" targetRef="bpmnGateway_186">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!collectJobDataAfterWarehousing}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_189" sourceRef="bpmnGateway_186" targetRef="bpmnEndEvent_188">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_207" name="true" sourceRef="bpmnGateway_205" targetRef="bpmnGateway_214">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${bestEffort}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_208" name="false" sourceRef="bpmnGateway_205" targetRef="emailAuditUserCallActivity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!bestEffort}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_215" name="retry" sourceRef="retryStagingGateway" targetRef="bpmnTask_180">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${retry}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_217" sourceRef="retryStagingGateway" targetRef="bpmnGateway_214">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!retry}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_216" sourceRef="bpmnGateway_214" targetRef="deleteCheckResults">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_202" sourceRef="auditChecksStarted" targetRef="bpmnTask_178">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_auditScannerWorkflow">
+    <bpmndi:BPMNPlane bpmnElement="auditScannerWorkflow" id="BPMNPlane_auditScannerWorkflow">
+      <bpmndi:BPMNShape bpmnElement="bpmnTask_185" id="BPMNShape_bpmnTask_185">
+        <omgdc:Bounds height="71.0" width="189.0" x="1834.8763588470179" y="413.20626898193865"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnTask_178" id="BPMNShape_bpmnTask_178">
+        <omgdc:Bounds height="61.0" width="206.0" x="404.0704025069231" y="418.20626898193865"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnTask_180" id="BPMNShape_bpmnTask_180">
+        <omgdc:Bounds height="60.0" width="207.0000000000001" x="882.5482292659307" y="418.70626898193865"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="deleteCheckResults" id="BPMNShape_deleteCheckResults">
+        <omgdc:Bounds height="70.0" width="171.0" x="1416.1654828992382" y="576.5423854708076"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnTask_181" id="BPMNShape_bpmnTask_181">
+        <omgdc:Bounds height="57.0" width="171.0" x="1416.1654828992382" y="420.20626898193865"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnTask_179" id="BPMNShape_bpmnTask_179">
+        <omgdc:Bounds height="57.0" width="168.0" x="668.2" y="421.70626898193865"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="emailAuditUserCallActivity" id="BPMNShape_emailAuditUserCallActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="1153.6654828992382" y="695.6711191209192"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnGateway_66" id="BPMNShape_bpmnGateway_66">
+        <omgdc:Bounds height="40.0" width="40.0" x="1183.6654828992382" y="428.70626898193865"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnGateway_190" id="BPMNShape_bpmnGateway_190">
+        <omgdc:Bounds height="40.0" width="40.0" x="1660.5532852863357" y="428.70626898193865"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnGateway_186" id="BPMNShape_bpmnGateway_186">
+        <omgdc:Bounds height="40.0" width="40.0" x="2109.3726442779043" y="428.70626898193865"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnGateway_205" id="BPMNShape_bpmnGateway_205">
+        <omgdc:Bounds height="40.0" width="40.0" x="1183.6654828992382" y="592.0208611022992"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="retryStagingGateway" id="BPMNShape_retryStagingGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="966.0482292659307" y="715.6711191209192"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnGateway_214" id="BPMNShape_bpmnGateway_214">
+        <omgdc:Bounds height="40.0" width="40.0" x="1301.6654828992382" y="591.5423854708076"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="auditChecksStarted" id="BPMNShape_auditChecksStarted">
+        <omgdc:Bounds height="30.0" width="30.0" x="301.43578178753745" y="433.70626898193865"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnEndEvent_188" id="BPMNShape_bpmnEndEvent_188">
+        <omgdc:Bounds height="28.0" width="28.0" x="2199.3726442779034" y="434.70626898193865"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnEndEvent_211" id="BPMNShape_bpmnEndEvent_211">
+        <omgdc:Bounds height="28.0" width="28.0" x="2199.3726442779034" y="598.0208611022992"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_214" id="BPMNEdge_bpmnSequenceFlow_214" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="1153.6654828992382" y="735.6711191209192"></omgdi:waypoint>
+        <omgdi:waypoint x="1006.0482292659308" y="735.6711191209192"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_215" id="BPMNEdge_bpmnSequenceFlow_215" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="104.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="986.0482292659307" y="715.6711191209192"></omgdi:waypoint>
+        <omgdi:waypoint x="986.0482292659307" y="478.70626898193865"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_216" id="BPMNEdge_bpmnSequenceFlow_216" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="86.0" flowable:targetDockerY="35.0">
+        <omgdi:waypoint x="1341.6654828992382" y="611.5423854708076"></omgdi:waypoint>
+        <omgdi:waypoint x="1378.889999153362" y="611.5423854708076"></omgdi:waypoint>
+        <omgdi:waypoint x="1378.889999153362" y="611.7816232865534"></omgdi:waypoint>
+        <omgdi:waypoint x="1416.1654828992382" y="611.7089890354786"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_217" id="BPMNEdge_bpmnSequenceFlow_217" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="986.0482292659307" y="755.6711191209192"></omgdi:waypoint>
+        <omgdi:waypoint x="986.0482292659307" y="820.2804225662933"></omgdi:waypoint>
+        <omgdi:waypoint x="1321.6654828992382" y="820.2804225662933"></omgdi:waypoint>
+        <omgdi:waypoint x="1321.6654828992382" y="631.5423854708076"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_199" id="BPMNEdge_bpmnSequenceFlow_199" flowable:sourceDockerX="84.0" flowable:sourceDockerY="29.0" flowable:targetDockerX="104.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="836.2" y="450.20626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="859.3741146329653" y="450.20626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="859.3741146329653" y="448.70626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="882.5482292659307" y="448.70626898193865"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_200" id="BPMNEdge_bpmnSequenceFlow_200" flowable:sourceDockerX="103.0" flowable:sourceDockerY="31.0" flowable:targetDockerX="84.0" flowable:targetDockerY="29.0">
+        <omgdi:waypoint x="610.0704025069231" y="448.70626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="639.1352012534616" y="448.70626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="639.1352012534616" y="450.20626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="668.2" y="450.20626898193865"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_189" id="BPMNEdge_bpmnSequenceFlow_189" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="2149.3726442779034" y="448.70626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="2199.3726442779034" y="448.70626898193865"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_202" id="BPMNEdge_bpmnSequenceFlow_202" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="103.0" flowable:targetDockerY="31.0">
+        <omgdi:waypoint x="331.43578178753745" y="448.70626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="404.0704025069231" y="448.70626898193865"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_218" id="BPMNEdge_bpmnSequenceFlow_218" flowable:sourceDockerX="86.0" flowable:sourceDockerY="35.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="1587.1654828992382" y="611.591820893966"></omgdi:waypoint>
+        <omgdi:waypoint x="1871.1038942713908" y="611.7816232865534"></omgdi:waypoint>
+        <omgdi:waypoint x="1871.1038942713908" y="612.0208611022992"></omgdi:waypoint>
+        <omgdi:waypoint x="2199.3726442779034" y="612.0208611022992"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_207" id="BPMNEdge_bpmnSequenceFlow_207" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="1223.6654828992382" y="612.0208611022992"></omgdi:waypoint>
+        <omgdi:waypoint x="1262.6654828992382" y="612.0208611022992"></omgdi:waypoint>
+        <omgdi:waypoint x="1262.6654828992382" y="611.5423854708076"></omgdi:waypoint>
+        <omgdi:waypoint x="1301.6654828992382" y="611.5423854708076"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_208" id="BPMNEdge_bpmnSequenceFlow_208" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="1203.6654828992382" y="632.0208611022992"></omgdi:waypoint>
+        <omgdi:waypoint x="1203.6654828992382" y="695.6711191209192"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="stagingCheckResultsFailureFlow" id="BPMNEdge_stagingCheckResultsFailureFlow" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="1203.6654828992382" y="468.70626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="1203.6654828992382" y="592.0208611022992"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_184" id="BPMNEdge_bpmnSequenceFlow_184" flowable:sourceDockerX="104.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="1089.5482292659308" y="448.70626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="1183.6654828992382" y="448.70626898193865"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_187" id="BPMNEdge_bpmnSequenceFlow_187" flowable:sourceDockerX="95.0" flowable:sourceDockerY="36.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="2023.8763588470179" y="448.70626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="2109.3726442779043" y="448.70626898193865"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_191" id="BPMNEdge_bpmnSequenceFlow_191" flowable:sourceDockerX="86.0" flowable:sourceDockerY="29.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="1587.1654828992382" y="448.70626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="1660.5532852863357" y="448.70626898193865"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_192" id="BPMNEdge_bpmnSequenceFlow_192" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="95.0" flowable:targetDockerY="36.0">
+        <omgdi:waypoint x="1700.5532852863357" y="448.70626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="1834.8763588470179" y="448.70626898193865"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_193" id="BPMNEdge_bpmnSequenceFlow_193" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="1680.5532852863357" y="468.70626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="1680.5532852863357" y="537.7062689819386"></omgdi:waypoint>
+        <omgdi:waypoint x="2129.3726442779043" y="537.7062689819386"></omgdi:waypoint>
+        <omgdi:waypoint x="2129.3726442779043" y="468.70626898193865"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="stagingChecksSuccessFlow" id="BPMNEdge_stagingChecksSuccessFlow" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="86.0" flowable:targetDockerY="29.0">
+        <omgdi:waypoint x="1223.6654828992382" y="448.70626898193865"></omgdi:waypoint>
+        <omgdi:waypoint x="1416.1654828992382" y="448.70626898193865"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

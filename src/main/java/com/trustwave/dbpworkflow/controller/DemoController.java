@@ -85,11 +85,13 @@ public class DemoController {
     }
 
     @GetMapping(value = "/retry/{processInstanceId}/{executionId}")
-    public String sendRetry(
-            @PathVariable String processInstanceId,
-            @PathVariable String executionId
-    ) {
+    public String sendRetry( @PathVariable String processInstanceId, @PathVariable String executionId ) {
         return service.sendRetry(processInstanceId, executionId);
+    }
+
+    @GetMapping(value = "/cancel/{processInstanceId}/{executionId}")
+    public String sendCancel( @PathVariable String processInstanceId, @PathVariable String executionId ) {
+        return service.sendCancel(processInstanceId, executionId);
     }
 
     @RequestMapping(value = "/scan", method = RequestMethod.GET)
@@ -151,7 +153,15 @@ public class DemoController {
                     sb.append("</li><li>");
                     sb.append("<a href='");
                     sb.append(msg);
-                    sb.append("' target='_blank'>Click here for retry of execution id: ");
+                    sb.append("' target='_blank'>Click here for RETRY of execution id: ");
+                    sb.append(m.getId());
+                    sb.append("</a>");
+
+                    msg = String.format("http://localhost:8080/cancel/%s/%s", pi.getId(), m.getId() );
+                    sb.append("</li><li>");
+                    sb.append("<a href='");
+                    sb.append(msg);
+                    sb.append("' target='_blank'>Click here for CANCEL of execution id: ");
                     sb.append(m.getId());
                     sb.append("</a>");
                 });

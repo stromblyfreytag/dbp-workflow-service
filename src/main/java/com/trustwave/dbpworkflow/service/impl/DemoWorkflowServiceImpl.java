@@ -66,6 +66,22 @@ public class DemoWorkflowServiceImpl implements DemoWorkflowService {
 
     @Override
     public String sendRetry(String processInstanceId, String executionId) {
+        final Boolean userResponseToRetry = Boolean.TRUE;
+        final String successResponse = "<html><body>Successful RETRY message to "+executionId+"</body></html>";
+
+        return sendMessageEventReceived(processInstanceId, executionId, userResponseToRetry, successResponse);
+    }
+
+    @Override
+    public String sendCancel(String processInstanceId, String executionId) {
+        final Boolean userResponseToRetry = Boolean.FALSE;
+        final String successResponse = "<html><body>Successful CANCEL message to "+executionId+"</body></html>";
+
+        return sendMessageEventReceived(processInstanceId, executionId, userResponseToRetry, successResponse);
+    }
+
+    private String sendMessageEventReceived(String processInstanceId, String executionId, Boolean userResponseToRetry,
+            String successResponse) {
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
                 .processInstanceId(processInstanceId)
                 .singleResult();
@@ -88,14 +104,14 @@ public class DemoWorkflowServiceImpl implements DemoWorkflowService {
                 .singleResult();
 
         if (execution == null) {
-            return "<html><body>No such executionId: "+executionId+"</body></html>";
+            return "<html><body>No such executionId: "+ executionId +"</body></html>";
         }
         else {
-            runtimeService.setVariable(executionId, "retry", Boolean.TRUE);
+            runtimeService.setVariable(executionId, "retry", userResponseToRetry);
             runtimeService.messageEventReceived(messageName, executionId);
         }
 
-        return "<html><body>Successful message to "+executionId+"</body></html>";
+        return successResponse;
     }
 
     @Override

@@ -16,6 +16,8 @@
 package com.trustwave.dbpworkflow.task;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -32,19 +34,34 @@ import com.trustwave.dbpworkflow.domain.Asset;
  *
  * @author sfreytag
  */
-public class LoadJobPropertiesAction implements JavaDelegate {
+public class LoadJobPropertiesAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
+        super.execute(execution);
         execution.setVariable("syncExceptions", Boolean.TRUE);
         execution.setVariable("failed", Boolean.FALSE);
         execution.setVariable("bestEffort", Boolean.FALSE);
         execution.setVariable("collectJobDataAfterWarehousing", Boolean.TRUE);
         execution.setVariable("successCount", 0L);
         execution.setVariable("reportCount", 0L);
-        ArrayList<Asset> value = new ArrayList<>();
-        for (int i=1; i < 4; i++) {
-            Asset asset = new Asset("asset"+i);
+
+        int assetCount = 4;
+        ArrayList<Asset> assets = new ArrayList<>();
+        ArrayList<String> jobKeys = new ArrayList<>();
+        ArrayList<String> reportConfigurations = new ArrayList<>();
+
+        for (int i=1; i < assetCount; i++) {
+            Asset asset = new Asset(false,"asset"+i);
+            assets.add(asset);
         }
-        execution.setVariable("assets", value);
+        execution.setVariable("assets", assets);
+        execution.setVariable("jobKeys", jobKeys);
+        execution.setVariable("reportConfigurations", reportConfigurations);
+
         System.out.println("Action: "+getClass().getSimpleName());
+    }
+
+    @Override
+    protected String getActionName() {
+        return this.getClass().getSimpleName();
     }
 }

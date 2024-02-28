@@ -28,8 +28,15 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class RandomDelayAction implements JavaDelegate {
+public class RandomDelayAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
+        super.execute(execution);
         System.out.println("RandomDelayAction Action");
     }
+
+    @Override
+    protected String getActionName() {
+        return this.getClass().getSimpleName();
+    }
+
 }

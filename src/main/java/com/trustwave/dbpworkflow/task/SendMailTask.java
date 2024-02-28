@@ -30,9 +30,15 @@ import org.springframework.stereotype.Component;
  * @author sfreytag
  */
 @Component
-public class SendMailTask implements JavaDelegate {
+public class SendMailTask extends BaseAction implements JavaDelegate {
     @Override
     public void execute(DelegateExecution delegateExecution) {
+        super.execute(delegateExecution);
         System.out.println("Sending mail");
+    }
+
+    @Override
+    protected String getActionName() {
+        return this.getClass().getSimpleName();
     }
 }

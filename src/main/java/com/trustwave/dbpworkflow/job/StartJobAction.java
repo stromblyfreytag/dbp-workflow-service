@@ -15,8 +15,11 @@
  */
 package com.trustwave.dbpworkflow.job;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
+
+import com.trustwave.dbpworkflow.task.BaseAction;
 
 /**
  * -- TODO add description here
@@ -28,8 +31,15 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class StartJobAction implements JavaDelegate {
+public class StartJobAction extends BaseAction implements JavaDelegate {
+    protected Expression jobItem;
+
     public void execute(DelegateExecution execution) {
-        System.out.println("StartJobAction Action");
+        super.execute(execution);
+    }
+
+    @Override
+    protected String getActionName() {
+        return getClass().getSimpleName();
     }
 }

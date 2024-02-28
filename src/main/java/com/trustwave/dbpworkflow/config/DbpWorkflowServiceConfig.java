@@ -18,6 +18,7 @@ package com.trustwave.dbpworkflow.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
@@ -52,6 +53,7 @@ public class DbpWorkflowServiceConfig {
 				parseHandlers.addAll(ParseHandlerRegistry.handlers());
 
 				processEngineConfiguration.setPostBpmnParseHandlers(parseHandlers);
+				processEngineConfiguration.setHistoryLevel(HistoryLevel.FULL); // keeps a LOT of data.  This is for testing
 			};
 		}
 }

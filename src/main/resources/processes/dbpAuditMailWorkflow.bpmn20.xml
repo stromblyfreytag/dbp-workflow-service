@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-work-process-palette">
+  <message id="eventResponseReceivedEvent" name="eventResponseReceivedEvent"></message>
+  <process id="dbpAuditMailWorkflow" name="Dbp Audit Mail Workflow" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <extensionElements>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:creationdate><![CDATA[2024-02-23T20:24:45.398Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2024-02-28T22:21:37.976Z]]></design:modificationdate>
+    </extensionElements>
+    <serviceTask id="emailAuditUserServiceTask" name="Email Audit User" flowable:class="com.trustwave.dbpworkflow.task.MailAction">
+      <extensionElements>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <scriptTask id="cleanupScriptTask" name="Cleanup" scriptFormat="groovy" flowable:autoStoreVariables="false">
+      <documentation>This is here for some non-specific cleanup that has to happen when the user cancels the action.</documentation>
+      <extensionElements>
+        <design:stencilid><![CDATA[ScriptTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+      <script><![CDATA[out:println 'Groovy script: Lets clean up']]></script>
+    </scriptTask>
+    <scriptTask id="retryOrCancelScriptTask" name="Retry Or Cancel Response" scriptFormat="groovy" flowable:autoStoreVariables="false">
+      <documentation>At this point, we need to look at which choice was chosen by the user, retry or cancel, and set that value in the context.</documentation>
+      <extensionElements>
+        <design:stencilid><![CDATA[ScriptTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+      <script><![CDATA[retry = true;]]></script>
+    </scriptTask>
+    <exclusiveGateway id="retryOrCancelGateway" name="Retry or Cancel?">
+      <documentation>This is where we look at what choice the user made; the value of the variable 'retry' should be in the context.</documentation>
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </exclusiveGateway>
+    <startEvent id="sendErrorEmailStart" name="Send Error Email Start" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <documentation>This is the beginning of the flow to send email and await a response.</documentation>
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </startEvent>
+    <intermediateCatchEvent id="failureEmailResponseReceiver" name="Response received">
+      <documentation>When the user pushes the button to either cancel or retry the event, this is the entry point.</documentation>
+      <extensionElements>
+        <design:stencilid><![CDATA[IntermediateMessageEventCatching]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <messageEventDefinition messageRef="eventResponseReceivedEvent"></messageEventDefinition>
+    </intermediateCatchEvent>
+    <endEvent id="retryActionEnd" name="Retry Action">
+      <documentation>The user has chosen to retry.  Return to the calling location.</documentation>
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <endEvent id="cancelActionEnd" name="Cancel Action">
+      <documentation>The user has chosen to cancel the action.  Return to the calling location.
+</documentation>
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="bpmnSequenceFlow_20" sourceRef="emailAuditUserServiceTask" targetRef="failureEmailResponseReceiver">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_19" sourceRef="cleanupScriptTask" targetRef="cancelActionEnd">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_21" sourceRef="retryOrCancelScriptTask" targetRef="retryOrCancelGateway">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="retryTaskChoice" name="retry" sourceRef="retryOrCancelGateway" targetRef="retryActionEnd">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${retry}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_22" sourceRef="retryOrCancelGateway" targetRef="cleanupScriptTask">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flowToEmailAuditUser" sourceRef="sendErrorEmailStart" targetRef="emailAuditUserServiceTask">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_10" sourceRef="failureEmailResponseReceiver" targetRef="retryOrCancelScriptTask">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_dbpAuditMailWorkflow">
+    <bpmndi:BPMNPlane bpmnElement="dbpAuditMailWorkflow" id="BPMNPlane_dbpAuditMailWorkflow">
+      <bpmndi:BPMNShape bpmnElement="emailAuditUserServiceTask" id="BPMNShape_emailAuditUserServiceTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="428.0" y="236.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="cleanupScriptTask" id="BPMNShape_cleanupScriptTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="1061.0" y="236.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="retryOrCancelScriptTask" id="BPMNShape_retryOrCancelScriptTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="728.5028516396006" y="236.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="retryOrCancelGateway" id="BPMNShape_retryOrCancelGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="923.0" y="256.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sendErrorEmailStart" id="BPMNShape_sendErrorEmailStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="317.0" y="261.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="failureEmailResponseReceiver" id="BPMNShape_failureEmailResponseReceiver">
+        <omgdc:Bounds height="30.0" width="30.0" x="610.0" y="261.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="retryActionEnd" id="BPMNShape_retryActionEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="1249.5028516396005" y="148.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="cancelActionEnd" id="BPMNShape_cancelActionEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="1249.5028516396005" y="262.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_22" id="BPMNEdge_bpmnSequenceFlow_22" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="963.0" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1061.0" y="276.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_21" id="BPMNEdge_bpmnSequenceFlow_21" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="828.5028516396005" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="923.0" y="276.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_10" id="BPMNEdge_bpmnSequenceFlow_10" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="640.0" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="728.5028516396006" y="276.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_19" id="BPMNEdge_bpmnSequenceFlow_19" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="1161.0" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1249.5028516396005" y="276.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="retryTaskChoice" id="BPMNEdge_retryTaskChoice" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="943.0" y="256.0"></omgdi:waypoint>
+        <omgdi:waypoint x="943.0" y="162.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1249.5028516396005" y="162.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToEmailAuditUser" id="BPMNEdge_flowToEmailAuditUser" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="347.0" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="428.0" y="276.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_20" id="BPMNEdge_bpmnSequenceFlow_20" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="15.0" flowable:targetDockerY="15.0">
+        <omgdi:waypoint x="528.0" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="610.0" y="276.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

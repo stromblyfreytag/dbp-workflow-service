@@ -30,6 +30,8 @@ import com.trustwave.dbpworkflow.domain.Scan;
  * @author sfreytag
  */
 public interface DemoWorkflowService {
+    String sendRetry(String processInstanceId, String executionId);
+
     String getHistory(String processInstanceId);
 
     void startProcess(Scan scan);

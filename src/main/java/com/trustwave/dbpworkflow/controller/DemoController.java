@@ -84,6 +84,14 @@ public class DemoController {
         return service.getHistory(processInstanceId);
     }
 
+    @GetMapping(value = "/retry/{processInstanceId}/{executionId}")
+    public String sendRetry(
+            @PathVariable String processInstanceId,
+            @PathVariable String executionId
+    ) {
+        return service.sendRetry(processInstanceId, executionId);
+    }
+
     @RequestMapping(value = "/scan", method = RequestMethod.GET)
     public String getScan(@RequestParam(name = "syncExceptions", defaultValue = "false") boolean syncExceptions,
             @RequestParam(name = "storeResults", defaultValue = "false") boolean storeResults) {
@@ -95,8 +103,8 @@ public class DemoController {
         processVariables.put("bestEffort", Boolean.FALSE);
 
         List<Asset> assets = new ArrayList<>();
-        assets.add(new Asset("asset1"));
-        assets.add(new Asset("asset2"));
+        assets.add(new Asset(false,"asset1"));
+        assets.add(new Asset(false,"asset2"));
         processVariables.put("assets", assets);
         String businessId = UUID.randomUUID().toString();
 
@@ -104,9 +112,11 @@ public class DemoController {
         reportConfigurations.add("report1");
         reportConfigurations.add("report2");
         processVariables.put("reportConfigurations", reportConfigurations);
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("scanAssetsWorkflow", businessId, processVariables);
+//        ProcessInstance pi = runtimeService.startProcessInstanceByKey("auditAssetsWorkflow", businessId, processVariables);
 //        ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", businessId, processVariables);
 //        ProcessInstance pi = runtimeService.startProcessInstanceByKey("scanAssetsSubProcessWorkflow", businessId, processVariables);
+//        ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleCallOut", businessId, processVariables);
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("dbpAssetMainWorkflow", businessId, processVariables);
 
         // the wait is an artificial task so we can make queries of the instance, if desired
         // put any queries here
@@ -114,15 +124,51 @@ public class DemoController {
 //        Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).activityId("waitTask").singleResult();
 //        runtimeService.trigger(execution.getId());
         String historyUrl = "http://localhost:8080/history/" + pi.getId();
-        return "Process instance has run. Process ID:"+pi.getId()+". <br><a href='" + historyUrl + "' target='_blank'>Click here for history</a>";
-    }
-    @PostMapping("/scan")
-    public void scan(@RequestParam Scan scan) {
-        service.startProcess(scan);
-    }
+        String defName = pi.getProcessDefinitionName();
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html><body>");
+        sb.append("Process instance has completed.");
+        sb.append("<ul><li>");
+        sb.append("Process Definition Name:");
+        sb.append(defName);sb.append("</li><li>Process ID:");
+        sb.append(pi.getId());
+        sb.append("</li></ul>");
+        sb.append("<br>");
+        sb.append("Here are your possible actions:<br>");
+        sb.append("<ul><li>");
+        sb.append("<a href='");
+        sb.append(historyUrl);
+        sb.append("' target='_blank'>Click here for history</a>");
 
-    @GetMapping("/scans")
-    public List<Scan> getScans() {
-        return service.getScans();
+
+        if (!pi.isEnded()) {
+            String messageName = "eventResponseReceivedEvent";
+            final List<Execution> list = runtimeService.createExecutionQuery().messageEventSubscriptionName(messageName).list();
+
+            if (!list.isEmpty()) {
+                list.forEach(m -> {
+                    String msg = String.format("http://localhost:8080/retry/%s/%s", pi.getId(), m.getId() );
+                    sb.append("</li><li>");
+                    sb.append("<a href='");
+                    sb.append(msg);
+                    sb.append("' target='_blank'>Click here for retry of execution id: ");
+                    sb.append(m.getId());
+                    sb.append("</a>");
+                });
+            }
+        }
+
+        sb.append("</li></ul>");
+        sb.append("</body></html>");
+        return sb.toString();
     }
+//    @PostMapping("/scan")
+//    public void scan(@RequestParam Scan scan) {
+//        service.startProcess(scan);
+//    }
+//
+//    @GetMapping("/scans")
+//    public List<Scan> getScans() {
+//        return service.getScans();
+//    }
 }

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-work-process-palette">
+  <process id="scanAssetWorkflow" name="Scan Asset Workflow" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <extensionElements>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:creationdate><![CDATA[2024-02-21T14:44:11.199Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2024-02-21T14:50:23.273Z]]></design:modificationdate>
+    </extensionElements>
+    <subProcess id="scanAssetSubprocess" name="Scan Asset Subprocess">
+      <extensionElements>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[ExpandedSubProcess]]></design:stencilid>
+      </extensionElements>
+      <startEvent id="scanAnAssetSubprocessStart" name="Subprocess Start" flowable:initiator="initiator" flowable:formFieldValidation="false">
+        <extensionElements>
+          <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+          <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </startEvent>
+      <intermediateThrowEvent id="scanningAssetReachedIntermediateEvent" name="Reached Intermediate Event">
+        <extensionElements>
+          <design:stencilid><![CDATA[IntermediateThrowingEvent]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[IntermediateEvent]]></design:stencilsuperid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </intermediateThrowEvent>
+      <endEvent id="scanAnAssetSubprocessComplete" name="Scan An Asset Subprocess Complete">
+        <extensionElements>
+          <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </endEvent>
+      <sequenceFlow id="bpmnSequenceFlow_5" sourceRef="scanAnAssetSubprocessStart" targetRef="scanningAssetReachedIntermediateEvent">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_7" sourceRef="scanningAssetReachedIntermediateEvent" targetRef="scanAnAssetSubprocessComplete">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+    </subProcess>
+    <startEvent id="scanAnAssetStart" name="Scan an Asset Start" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="scanAnAssetComplete" name="scanAnAssetComplete">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="bpmnSequenceFlow_9" sourceRef="scanAssetSubprocess" targetRef="scanAnAssetComplete">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_2" sourceRef="scanAnAssetStart" targetRef="scanAssetSubprocess">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_scanAssetWorkflow">
+    <bpmndi:BPMNPlane bpmnElement="scanAssetWorkflow" id="BPMNPlane_scanAssetWorkflow">
+      <bpmndi:BPMNShape bpmnElement="scanAssetSubprocess" id="BPMNShape_scanAssetSubprocess">
+        <omgdc:Bounds height="149.0" width="709.0" x="364.3" y="201.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scanAnAssetSubprocessStart" id="BPMNShape_scanAnAssetSubprocessStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="478.3" y="261.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scanningAssetReachedIntermediateEvent" id="BPMNShape_scanningAssetReachedIntermediateEvent">
+        <omgdc:Bounds height="30.0" width="30.000000000000057" x="707.3" y="261.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scanAnAssetSubprocessComplete" id="BPMNShape_scanAnAssetSubprocessComplete">
+        <omgdc:Bounds height="28.0" width="28.000000000000057" x="893.3" y="262.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scanAnAssetStart" id="BPMNShape_scanAnAssetStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="204.3" y="261.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scanAnAssetComplete" id="BPMNShape_scanAnAssetComplete">
+        <omgdc:Bounds height="28.0" width="28.0" x="1114.3" y="262.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_9" id="BPMNEdge_bpmnSequenceFlow_9" flowable:sourceDockerX="355.0" flowable:sourceDockerY="75.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="1073.3" y="275.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1093.8" y="275.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1093.8" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1114.3" y="276.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_2" id="BPMNEdge_bpmnSequenceFlow_2" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="355.0" flowable:targetDockerY="75.0">
+        <omgdi:waypoint x="234.3" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="299.3" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="299.3" y="275.5"></omgdi:waypoint>
+        <omgdi:waypoint x="364.3" y="275.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_7" id="BPMNEdge_bpmnSequenceFlow_7" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="737.3" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="893.3" y="276.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_5" id="BPMNEdge_bpmnSequenceFlow_5" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="15.0" flowable:targetDockerY="15.0">
+        <omgdi:waypoint x="508.3" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="707.3" y="276.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

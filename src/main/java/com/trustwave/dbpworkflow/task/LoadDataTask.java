@@ -29,8 +29,14 @@ import org.springframework.stereotype.Component;
  * @author sfreytag
  */
 @Component
-public class LoadDataTask implements JavaDelegate {
+public class LoadDataTask extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
+        super.execute(execution);
         System.out.println("Data is being loaded.");
+    }
+
+    @Override
+    protected String getActionName() {
+        return this.getClass().getSimpleName();
     }
 }

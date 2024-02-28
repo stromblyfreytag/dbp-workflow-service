@@ -38,8 +38,12 @@ abstract public class BaseAction {
     protected List<Expression> valuePresent = new ArrayList<>();
 
     public void execute(DelegateExecution execution) {
+        // Because this variable is being used to control the exit value
+        // of a task, it should have a known value at the beginning.
+        // To be clear, there probably is a better way.
+        execution.setVariable("failure", false);
         new RecordedExecutionListener().notify(execution);
-        System.out.println("Action: "+getActionName());
+        System.out.println("Java Called. Action name is [ "+getActionName() + "]");
         if (task != null) {
             System.out.println("   task: " + task.getExpressionText());
         }

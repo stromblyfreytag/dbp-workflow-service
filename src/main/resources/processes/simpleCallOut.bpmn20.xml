@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-work-process-palette">
+  <process id="simpleCallOut" name="simpleCallOut" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <extensionElements>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:creationdate><![CDATA[2024-02-15T16:43:14.085Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2024-02-15T17:00:35.097Z]]></design:modificationdate>
+    </extensionElements>
+    <callActivity id="simpleMultiParallelCallActivity" name="Simple Multi-Parallel Call activity" calledElement="simpleSubProcess" flowable:inheritVariables="true" flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true">
+      <documentation>to test connectivity to subprocesses using parallel processing on the collection 'assets'</documentation>
+      <extensionElements>
+        <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${assets}" flowable:elementVariable="asset">
+        <extensionElements></extensionElements>
+      </multiInstanceLoopCharacteristics>
+    </callActivity>
+    <startEvent id="simpleCallActivityStart" name="Simple Call Activity Start" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <documentation>The process should start here</documentation>
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="simpleCallActivityEnd" name="Simple Call Activity End">
+      <documentation>Should be the end of the Simple call activity</documentation>
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flowToEnd" name="Flow to End" sourceRef="simpleMultiParallelCallActivity" targetRef="simpleCallActivityEnd">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flowToSubprocess" name="Flow to Subprocess" sourceRef="simpleCallActivityStart" targetRef="simpleMultiParallelCallActivity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_simpleCallOut">
+    <bpmndi:BPMNPlane bpmnElement="simpleCallOut" id="BPMNPlane_simpleCallOut">
+      <bpmndi:BPMNShape bpmnElement="simpleMultiParallelCallActivity" id="BPMNShape_simpleMultiParallelCallActivity">
+        <omgdc:Bounds height="75.0" width="212.0" x="495.0" y="219.8"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="simpleCallActivityStart" id="BPMNShape_simpleCallActivityStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="333.0" y="242.3"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="simpleCallActivityEnd" id="BPMNShape_simpleCallActivityEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="816.0" y="243.3"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flowToSubprocess" id="BPMNEdge_flowToSubprocess" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="106.0" flowable:targetDockerY="38.0">
+        <omgdi:waypoint x="363.0" y="257.3"></omgdi:waypoint>
+        <omgdi:waypoint x="495.0" y="257.3"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToEnd" id="BPMNEdge_flowToEnd" flowable:sourceDockerX="106.0" flowable:sourceDockerY="38.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="707.0" y="257.3"></omgdi:waypoint>
+        <omgdi:waypoint x="816.0" y="257.3"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

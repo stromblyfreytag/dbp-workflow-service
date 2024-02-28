@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="scan workflows" design:palette="flowable-work-process-palette">
+  <process id="auditAssetValidationWorkflow" name="Audit Asset Validation Workflow" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <documentation>Validate the asset's information</documentation>
+    <extensionElements>
+      <flowable:processInstanceName><![CDATA[AuditScanWorkflow]]></flowable:processInstanceName>
+      <flowable:processInstanceBusinessKey><![CDATA[DBP]]></flowable:processInstanceBusinessKey>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:creationdate><![CDATA[2024-02-08T21:29:55.240Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2024-02-14T21:54:03.715Z]]></design:modificationdate>
+    </extensionElements>
+    <subProcess id="bpmnStructure_170" name="validation subprocess">
+      <extensionElements>
+        <design:stencilid><![CDATA[ExpandedSubProcess]]></design:stencilid>
+      </extensionElements>
+      <serviceTask id="bpmnTask_162" name="Identifying Capable Scanner" flowable:class="com.trustwave.dbpworkflow.asset.RetrieveEndpointAction">
+        <extensionElements>
+          <flowable:field name="valuePresent">
+            <flowable:string><![CDATA[asset]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="credentialType">
+            <flowable:string><![CDATA[OS]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="assetCredentialMapping">
+            <flowable:string><![CDATA[true]]></flowable:string>
+          </flowable:field>
+          <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </serviceTask>
+      <serviceTask id="bpmnTask_163" name="Validating Credentials for Audit" flowable:class="com.trustwave.dbpworkflow.check.VerifyCanAuditAction
+">
+        <extensionElements>
+          <flowable:field name="valuePresent">
+            <flowable:string><![CDATA[asset]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="endpoint">
+            <flowable:expression><![CDATA[${databaseEndpoint == null ? osEndpoint : databaseEndpoint}]]></flowable:expression>
+          </flowable:field>
+          <flowable:field name="valuePresent">
+            <flowable:string><![CDATA[checkServiceUrl]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="skipCredentialStrengthValidation">
+            <flowable:string><![CDATA[true]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="saveValidationInfo">
+            <flowable:string><![CDATA[true]]></flowable:string>
+          </flowable:field>
+          <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </serviceTask>
+      <serviceTask id="bpmnTask_161" name="Identifying Database Credentials" flowable:class="com.trustwave.dbpworkflow.asset.RetrieveEndpointAction">
+        <extensionElements>
+          <flowable:field name="valuePresent">
+            <flowable:string><![CDATA[asset]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="credentialType">
+            <flowable:string><![CDATA[DB]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="assetCredentialMapping">
+            <flowable:string><![CDATA[true]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="valuePresent">
+            <flowable:string><![CDATA[preferredCredNames]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="${fieldname}">
+            <flowable:expression><![CDATA[${expression}]]></flowable:expression>
+          </flowable:field>
+          <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </serviceTask>
+      <serviceTask id="bpmnTask_160" name="Validating Applicable Checks" flowable:class="com.trustwave.dbpworkflow.asset.NoChecksForAssetThrottlerAction">
+        <extensionElements>
+          <flowable:field name="valuePresent">
+            <flowable:string><![CDATA[asset]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="valuePresent">
+            <flowable:string><![CDATA[checkSetId]]></flowable:string>
+          </flowable:field>
+          <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </serviceTask>
+      <serviceTask id="validationAssetOrganizationAction" name="Validating Asset Organization" flowable:class="com.trustwave.dbpworkflow.task.ApplyValidatorsAction">
+        <extensionElements>
+          <flowable:field name="jobParameterName">
+            <flowable:string><![CDATA[assetSet]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="nonPreventitiveOnly">
+            <flowable:string><![CDATA[true]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="valuePresent">
+            <flowable:string><![CDATA[assetId]]></flowable:string>
+          </flowable:field>
+          <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </serviceTask>
+      <serviceTask id="validationAssetDefinitionAction" name="Validating Asset Definition" flowable:class="com.trustwave.dbpworkflow.check.InvalidAssetThrottler">
+        <extensionElements>
+          <flowable:field name="task">
+            <flowable:string><![CDATA[Pre-execution Asset Check]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="category">
+            <flowable:string><![CDATA[Prechecks]]></flowable:string>
+          </flowable:field>
+          <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </serviceTask>
+      <startEvent id="auditAssetSubprocessStart" name="start" flowable:initiator="initiator" flowable:formFieldValidation="false">
+        <extensionElements>
+          <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+          <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </startEvent>
+      <endEvent id="validationSubprocessEnd" name="end">
+        <extensionElements>
+          <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </endEvent>
+      <sequenceFlow id="bpmnSequenceFlow_169" sourceRef="bpmnTask_162" targetRef="bpmnTask_163">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_171" sourceRef="bpmnTask_163" targetRef="validationSubprocessEnd">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_168" sourceRef="bpmnTask_161" targetRef="bpmnTask_162">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_167" sourceRef="bpmnTask_160" targetRef="bpmnTask_161">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_166" sourceRef="validationAssetOrganizationAction" targetRef="bpmnTask_160">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_165" sourceRef="validationAssetDefinitionAction" targetRef="validationAssetOrganizationAction">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="bpmnSequenceFlow_164" sourceRef="auditAssetSubprocessStart" targetRef="validationAssetDefinitionAction">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+    </subProcess>
+    <startEvent id="validateAssetsStart" name="start" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="validationFailedEnd" name="validation failed">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <endEvent id="validationCompleted" name="validation suceeded">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <boundaryEvent id="failureBoundaryEvent_179" name="failed" attachedToRef="bpmnStructure_170" cancelActivity="true">
+      <extensionElements>
+        <flowable:variableListenerEventDefinition variableName="failure" variableChangeType="all"></flowable:variableListenerEventDefinition>
+        <design:stencilid><![CDATA[IntermediateVariableListenerEventBoundary]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </boundaryEvent>
+    <sequenceFlow id="bpmnSequenceFlow_180" sourceRef="failureBoundaryEvent_179" targetRef="validationFailedEnd">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_178" sourceRef="bpmnStructure_170" targetRef="validationCompleted">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_172" sourceRef="validateAssetsStart" targetRef="bpmnStructure_170">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_auditAssetValidationWorkflow">
+    <bpmndi:BPMNPlane bpmnElement="auditAssetValidationWorkflow" id="BPMNPlane_auditAssetValidationWorkflow">
+      <bpmndi:BPMNShape bpmnElement="bpmnStructure_170" id="BPMNShape_bpmnStructure_170">
+        <omgdc:Bounds height="226.0" width="1559.0" x="285.0" y="343.22283935546875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnTask_162" id="BPMNShape_bpmnTask_162">
+        <omgdc:Bounds height="65.0" width="176.0" x="1291.2" y="423.72283935546875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnTask_163" id="BPMNShape_bpmnTask_163">
+        <omgdc:Bounds height="56.0" width="189.0" x="1517.7" y="428.22283935546875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnTask_161" id="BPMNShape_bpmnTask_161">
+        <omgdc:Bounds height="51.0" width="201.0" x="1047.7" y="430.72283935546875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="bpmnTask_160" id="BPMNShape_bpmnTask_160">
+        <omgdc:Bounds height="55.0" width="179.0" x="822.7" y="428.72283935546875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validationAssetOrganizationAction" id="BPMNShape_validationAssetOrganizationAction">
+        <omgdc:Bounds height="51.0" width="174.0" x="598.2" y="430.72283935546875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validationAssetDefinitionAction" id="BPMNShape_validationAssetDefinitionAction">
+        <omgdc:Bounds height="48.0" width="159.0" x="395.5" y="432.22283935546875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="auditAssetSubprocessStart" id="BPMNShape_auditAssetSubprocessStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="329.0" y="441.22283935546875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validationSubprocessEnd" id="BPMNShape_validationSubprocessEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="1758.7" y="442.22283935546875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validateAssetsStart" id="BPMNShape_validateAssetsStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="170.0" y="441.22283935546875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validationFailedEnd" id="BPMNShape_validationFailedEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="1942.0" y="516.2228393554688"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validationCompleted" id="BPMNShape_validationCompleted">
+        <omgdc:Bounds height="28.0" width="28.0" x="1942.0" y="442.22283935546875"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="failureBoundaryEvent_179" id="BPMNShape_failureBoundaryEvent_179">
+        <omgdc:Bounds height="30.0" width="30.0" x="1829.0" y="515.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_166" id="BPMNEdge_bpmnSequenceFlow_166" flowable:sourceDockerX="87.0" flowable:sourceDockerY="26.0" flowable:targetDockerX="90.0" flowable:targetDockerY="28.0">
+        <omgdi:waypoint x="772.2" y="456.22283935546875"></omgdi:waypoint>
+        <omgdi:waypoint x="822.7" y="456.22283935546875"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_167" id="BPMNEdge_bpmnSequenceFlow_167" flowable:sourceDockerX="90.0" flowable:sourceDockerY="28.0" flowable:targetDockerX="101.0" flowable:targetDockerY="26.0">
+        <omgdi:waypoint x="1001.7" y="456.22283935546875"></omgdi:waypoint>
+        <omgdi:waypoint x="1047.7" y="456.22283935546875"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_178" id="BPMNEdge_bpmnSequenceFlow_178" flowable:sourceDockerX="780.0" flowable:sourceDockerY="113.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="1844.0" y="456.22283935546875"></omgdi:waypoint>
+        <omgdi:waypoint x="1942.0" y="456.22283935546875"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_168" id="BPMNEdge_bpmnSequenceFlow_168" flowable:sourceDockerX="101.0" flowable:sourceDockerY="26.0" flowable:targetDockerX="88.0" flowable:targetDockerY="33.0">
+        <omgdi:waypoint x="1248.7" y="456.22283935546875"></omgdi:waypoint>
+        <omgdi:waypoint x="1291.2" y="456.22283935546875"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_169" id="BPMNEdge_bpmnSequenceFlow_169" flowable:sourceDockerX="88.0" flowable:sourceDockerY="33.0" flowable:targetDockerX="95.0" flowable:targetDockerY="28.0">
+        <omgdi:waypoint x="1467.2" y="456.22283935546875"></omgdi:waypoint>
+        <omgdi:waypoint x="1517.7" y="456.22283935546875"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_164" id="BPMNEdge_bpmnSequenceFlow_164" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="80.0" flowable:targetDockerY="24.0">
+        <omgdi:waypoint x="359.0" y="456.22283935546875"></omgdi:waypoint>
+        <omgdi:waypoint x="395.5" y="456.22283935546875"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_165" id="BPMNEdge_bpmnSequenceFlow_165" flowable:sourceDockerX="80.0" flowable:sourceDockerY="24.0" flowable:targetDockerX="87.0" flowable:targetDockerY="26.0">
+        <omgdi:waypoint x="554.5" y="456.22283935546875"></omgdi:waypoint>
+        <omgdi:waypoint x="598.2" y="456.22283935546875"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_180" id="BPMNEdge_bpmnSequenceFlow_180" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="1859.0" y="530.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1900.5" y="530.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1900.5" y="530.2228393554688"></omgdi:waypoint>
+        <omgdi:waypoint x="1942.0" y="530.2228393554688"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_171" id="BPMNEdge_bpmnSequenceFlow_171" flowable:sourceDockerX="95.0" flowable:sourceDockerY="28.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="1706.7" y="456.22283935546875"></omgdi:waypoint>
+        <omgdi:waypoint x="1758.7" y="456.22283935546875"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_172" id="BPMNEdge_bpmnSequenceFlow_172" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="780.0" flowable:targetDockerY="113.0">
+        <omgdi:waypoint x="200.0" y="456.22283935546875"></omgdi:waypoint>
+        <omgdi:waypoint x="285.0" y="456.22283935546886"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

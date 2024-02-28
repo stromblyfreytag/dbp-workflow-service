@@ -28,8 +28,14 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class WaitForInputAction implements JavaDelegate {
+public class WaitForInputAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
+        super.execute(execution);
         System.out.println("WaitForInputAction Action");
+    }
+
+    @Override
+    protected String getActionName() {
+        return this.getClass().getSimpleName();
     }
 }

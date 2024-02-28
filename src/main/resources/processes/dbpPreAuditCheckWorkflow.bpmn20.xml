@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-work-process-palette">
+  <process id="dbpPreAuditCheckWorkflow" name="DbpPreAuditCheckWorkflow" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <extensionElements>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:creationdate><![CDATA[2024-02-21T18:17:17.452Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2024-02-27T20:05:16.259Z]]></design:modificationdate>
+    </extensionElements>
+    <serviceTask id="synchronizeKbServiceFullAction" name="Synchronize Kb Service Full" flowable:class="com.trustwave.dbpworkflow.check.SynchronizeKbServiceActionFull">
+      <extensionElements>
+        <flowable:field name="task">
+          <flowable:string><![CDATA[Synchronize Kb Service Full]]></flowable:string>
+        </flowable:field>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="synchronizeKbServiceAction" name="Synchronize Kb Service Action" flowable:class="com.trustwave.dbpworkflow.check.SynchronizeKbServiceActionFull">
+      <extensionElements>
+        <flowable:field name="task">
+          <flowable:string><![CDATA[Synchronize Kb Service Action]]></flowable:string>
+        </flowable:field>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="preExecutionPolicyCheckActivity" name="PreExcecution Policy Check" flowable:class="com.trustwave.dbpworkflow.check.PolicyListToCheckSetsAction">
+      <extensionElements>
+        <flowable:field name="task">
+          <flowable:string><![CDATA[PreExecution Policy Check]]></flowable:string>
+        </flowable:field>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <exclusiveGateway id="syncExceptionGateway" name="Sync Exceptions?">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </exclusiveGateway>
+    <exclusiveGateway id="flowJoinPoint">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+      </extensionElements>
+    </exclusiveGateway>
+    <startEvent id="preAuditChecksStart" name="PreAuditChecks Started" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="preAuditChecksPerformedEnd" name="PreAudit Checks Performed">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flowToJoinPointTrue" sourceRef="synchronizeKbServiceFullAction" targetRef="flowJoinPoint">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flowToJoinPointFalse" sourceRef="synchronizeKbServiceAction" targetRef="flowJoinPoint">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flowToEnd" sourceRef="preExecutionPolicyCheckActivity" targetRef="preAuditChecksPerformedEnd">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="syncExceptionFalse" name="false" sourceRef="syncExceptionGateway" targetRef="synchronizeKbServiceAction">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${syncExceptions}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="syncExceptionTrue" name="true" sourceRef="syncExceptionGateway" targetRef="synchronizeKbServiceFullAction">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!syncException}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowToPreExecutionCheck" sourceRef="flowJoinPoint" targetRef="preExecutionPolicyCheckActivity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flowToSyncExceptions" sourceRef="preAuditChecksStart" targetRef="syncExceptionGateway">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_dbpPreAuditCheckWorkflow">
+    <bpmndi:BPMNPlane bpmnElement="dbpPreAuditCheckWorkflow" id="BPMNPlane_dbpPreAuditCheckWorkflow">
+      <bpmndi:BPMNShape bpmnElement="synchronizeKbServiceFullAction" id="BPMNShape_synchronizeKbServiceFullAction">
+        <omgdc:Bounds height="78.0" width="161.0" x="609.0" y="340.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="synchronizeKbServiceAction" id="BPMNShape_synchronizeKbServiceAction">
+        <omgdc:Bounds height="75.0" width="166.0" x="606.5" y="236.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="preExecutionPolicyCheckActivity" id="BPMNShape_preExecutionPolicyCheckActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="910.0" y="233.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="syncExceptionGateway" id="BPMNShape_syncExceptionGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="460.0" y="256.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="flowJoinPoint" id="BPMNShape_flowJoinPoint">
+        <omgdc:Bounds height="40.0" width="40.0" x="820.0" y="253.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="preAuditChecksStart" id="BPMNShape_preAuditChecksStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="317.0" y="261.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="preAuditChecksPerformedEnd" id="BPMNShape_preAuditChecksPerformedEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="1106.0" y="259.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flowToJoinPointFalse" id="BPMNEdge_flowToJoinPointFalse" flowable:sourceDockerX="83.0" flowable:sourceDockerY="38.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="772.5" y="273.5"></omgdi:waypoint>
+        <omgdi:waypoint x="820.0" y="273.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToSyncExceptions" id="BPMNEdge_flowToSyncExceptions" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="347.0" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="276.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="syncExceptionFalse" id="BPMNEdge_syncExceptionFalse" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="83.0" flowable:targetDockerY="38.0">
+        <omgdi:waypoint x="500.0" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="552.0" y="276.0"></omgdi:waypoint>
+        <omgdi:waypoint x="552.0" y="273.5"></omgdi:waypoint>
+        <omgdi:waypoint x="606.5" y="273.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="syncExceptionTrue" id="BPMNEdge_syncExceptionTrue" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="81.0" flowable:targetDockerY="39.0">
+        <omgdi:waypoint x="480.0" y="296.0"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="379.0"></omgdi:waypoint>
+        <omgdi:waypoint x="609.0" y="379.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToEnd" id="BPMNEdge_flowToEnd" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="1010.0" y="273.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1106.0" y="273.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToJoinPointTrue" id="BPMNEdge_flowToJoinPointTrue" flowable:sourceDockerX="81.0" flowable:sourceDockerY="39.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="770.0" y="379.0"></omgdi:waypoint>
+        <omgdi:waypoint x="840.0" y="379.0"></omgdi:waypoint>
+        <omgdi:waypoint x="840.0" y="293.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToPreExecutionCheck" id="BPMNEdge_flowToPreExecutionCheck" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="860.0" y="273.5"></omgdi:waypoint>
+        <omgdi:waypoint x="910.0" y="273.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -37,6 +37,6 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class Asset implements Serializable {
+    private Boolean passedPrecheck = Boolean.FALSE;
     private String id;
-
 }

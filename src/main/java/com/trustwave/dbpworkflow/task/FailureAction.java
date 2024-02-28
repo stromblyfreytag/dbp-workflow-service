@@ -28,9 +28,15 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class FailureAction implements JavaDelegate {
+public class FailureAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
+        super.execute(execution);
         System.err.println("Hey, the previous task failed.  Here's then name: "+execution.getParent().getEventName());
         System.out.println("Action: "+getClass().getSimpleName());
+    }
+
+    @Override
+    protected String getActionName() {
+        return this.getClass().getSimpleName();
     }
 }

@@ -18,6 +18,8 @@ package com.trustwave.dbpworkflow.check;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
+import com.trustwave.dbpworkflow.task.BaseAction;
+
 /**
  * -- TODO add description here
  *
@@ -28,8 +30,14 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class SynchronizeKbServiceAction implements JavaDelegate {
+public class SynchronizeKbServiceAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
+        super.execute(execution);
         System.out.println("SynchronizeKbServiceAction Action");
+    }
+
+    @Override
+    protected String getActionName() {
+        return this.getClass().getSimpleName();
     }
 }

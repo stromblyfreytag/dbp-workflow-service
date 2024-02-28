@@ -19,6 +19,8 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
+import com.trustwave.dbpworkflow.domain.Asset;
+import com.trustwave.dbpworkflow.task.BaseAction;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,14 +38,18 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PolicyListToCheckSetsAction implements JavaDelegate {
-    private Expression task;
-
+public class PolicyListToCheckSetsAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
+        super.execute(execution);
+        final Asset asset = (Asset)execution.getVariable("asset");
+        asset.setPassedPrecheck(true);
+        execution.setVariable("asset", asset);
+        execution.setVariable("failed", Boolean.FALSE);
         System.out.println("PolicyListToCheckSetsAction Action. Task="+task.getExpressionText());
     }
 
-    public void setTask(Expression task) {
-        this.task = task;
+    @Override
+    protected String getActionName() {
+        return getClass().getSimpleName();
     }
 }

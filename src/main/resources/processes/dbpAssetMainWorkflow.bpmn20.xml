@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-work-process-palette">
+  <message id="emailResponseEvent" name="Email Response Event"></message>
+  <process id="dbpAssetMainWorkflow" name="DbpAssetMainWorkflow" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <documentation>This is the main flow of auditing an asset.</documentation>
+    <extensionElements>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:creationdate><![CDATA[2024-02-21T18:08:50.844Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2024-02-27T19:33:04.060Z]]></design:modificationdate>
+    </extensionElements>
+    <callActivity id="auditPreCheckCallActivity" name="Audit Pre-Check" calledElement="dbpPreAuditCheckWorkflow" flowable:inheritBusinessKey="true" flowable:inheritVariables="true" flowable:sameDeployment="true">
+      <documentation>Run pre-checks for audits in parallel.  This is a call-out to a process that handles a single asset.  The call out is defined as parallel and based on the 'assets' collection in the context.</documentation>
+      <extensionElements>
+        <flowable:out source="failed" target="failed"></flowable:out>
+        <flowable:out source="errors" target="errors"></flowable:out>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${assets}" flowable:elementVariable="asset">
+        <extensionElements></extensionElements>
+      </multiInstanceLoopCharacteristics>
+    </callActivity>
+    <serviceTask id="loadJobPropertiesActivity" name="Load Job Properties" flowable:class="com.trustwave.dbpworkflow.task.LoadJobPropertiesAction">
+      <extensionElements>
+        <flowable:field name="task">
+          <flowable:string><![CDATA[Load Job Properties]]></flowable:string>
+        </flowable:field>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="collectOperationalDataActivity" name="Collect Operational Data" flowable:class="com.trustwave.dbpworkflow.task.CollectOperationalDataAction">
+      <documentation>Collect the operational data, whatever that entails.</documentation>
+      <extensionElements>
+        <flowable:field name="task">
+          <flowable:string><![CDATA[Collect Operational Data]]></flowable:string>
+        </flowable:field>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <callActivity id="scanAssetsCallActivity" name="Scan Assets Call Activity" calledElement="dbpScanAssetWorkflow" flowable:inheritBusinessKey="true" flowable:inheritVariables="true" flowable:sameDeployment="true">
+      <extensionElements>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${assets}" flowable:elementVariable="asset">
+        <extensionElements></extensionElements>
+      </multiInstanceLoopCharacteristics>
+    </callActivity>
+    <serviceTask id="loadingOperationalDataActvity" name="Loading Operational Data" flowable:class="com.trustwave.dbpworkflow.task.RunEtlAction">
+      <extensionElements>
+        <flowable:field name="task">
+          <flowable:string><![CDATA[Operational Data Processing]]></flowable:string>
+        </flowable:field>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="retrievingJobDataActivity" name="Retrieving Job Data" flowable:class="com.trustwave.dbpworkflow.task.CollectJobInstanceDataAction">
+      <extensionElements>
+        <flowable:field name="task">
+          <flowable:string><![CDATA[Job Data Processing]]></flowable:string>
+        </flowable:field>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="loadingJobDataActivity" name="Loading Job Data" flowable:class="com.trustwave.dbpworkflow.task.RunEtlAction">
+      <extensionElements>
+        <flowable:field name="task">
+          <flowable:string><![CDATA[Loading Job Data]]></flowable:string>
+        </flowable:field>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <callActivity id="executeReportsCallActivity" name="Execute Reports" calledElement="dbpExecuteReportsWorkflow" flowable:inheritBusinessKey="true" flowable:inheritVariables="true" flowable:sameDeployment="true">
+      <extensionElements>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${reportConfigurations}" flowable:elementVariable="reportConfiguration">
+        <extensionElements></extensionElements>
+      </multiInstanceLoopCharacteristics>
+    </callActivity>
+    <callActivity id="createReportsCallActivity" name="Create Reports" calledElement="dbpCreateReportsWorkflow" flowable:inheritBusinessKey="true" flowable:inheritVariables="true" flowable:sameDeployment="true">
+      <extensionElements>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[CallActivity]]></design:stencilid>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${jobKeys}" flowable:elementVariable="jobKey">
+        <extensionElements></extensionElements>
+      </multiInstanceLoopCharacteristics>
+    </callActivity>
+    <serviceTask id="prepareJobSummaryActivity" name="Prepare Job Summary" flowable:class="com.trustwave.dbpworkflow.task.FormatDateTimeAction">
+      <extensionElements>
+        <flowable:field name="task">
+          <flowable:string><![CDATA[Prepare Job Summary]]></flowable:string>
+        </flowable:field>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <parallelGateway id="parallelGatewayScanAndLoadOperationalData">
+      <documentation>Parallel gateways create a token for each pathway, and as the name suggest, executes each path at the same time, assuming there are enough machine threads.
+An identical parallel gateway should be defined that all the pathways point to.  It is at this 'join point' that all pathways wait until all the tokens reach the join.  At that pointin time, processing continues.</documentation>
+      <extensionElements>
+        <design:stencilid><![CDATA[ParallelGateway]]></design:stencilid>
+      </extensionElements>
+    </parallelGateway>
+    <parallelGateway id="joinParallelGateway">
+      <documentation>This is where all of the different tokens created by the 'starting' parallel gatway end up.  Processing pauses until all tokens arrive here.  Processing then continues.</documentation>
+      <extensionElements>
+        <design:stencilid><![CDATA[ParallelGateway]]></design:stencilid>
+      </extensionElements>
+    </parallelGateway>
+    <exclusiveGateway id="successCountGateway" name="Success Count?">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </exclusiveGateway>
+    <exclusiveGateway id="successCountJoin">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+      </extensionElements>
+    </exclusiveGateway>
+    <exclusiveGateway id="reportCountGateway" name="Report Count?">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </exclusiveGateway>
+    <exclusiveGateway id="reportCountJoin">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+      </extensionElements>
+    </exclusiveGateway>
+    <exclusiveGateway id="reportsExecutedGateway" name="Reports Executed?">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </exclusiveGateway>
+    <exclusiveGateway id="reportsExecutedJoin">
+      <extensionElements>
+        <design:stencilid><![CDATA[Exclusive_Databased_Gateway]]></design:stencilid>
+      </extensionElements>
+    </exclusiveGateway>
+    <startEvent id="auditWorkflowStart" name="Start Audit Workflow" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <documentation>Starting point of the Audit Workflow</documentation>
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="jobCompleteEnd" name="Job Complete">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flowToCollectOperationalData" sourceRef="auditPreCheckCallActivity" targetRef="collectOperationalDataActivity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flowToAuditPreCheck" sourceRef="loadJobPropertiesActivity" targetRef="auditPreCheckCallActivity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flowToScanAssets" sourceRef="collectOperationalDataActivity" targetRef="parallelGatewayScanAndLoadOperationalData">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="scanAssetToJoinFlow" sourceRef="scanAssetsCallActivity" targetRef="joinParallelGateway">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="loadingOperationlToJoinFlow" sourceRef="loadingOperationalDataActvity" targetRef="joinParallelGateway">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flowToLoadingJobData" sourceRef="retrievingJobDataActivity" targetRef="loadingJobDataActivity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_18" sourceRef="loadingJobDataActivity" targetRef="successCountGateway">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flowFromExecutReports" sourceRef="executeReportsCallActivity" targetRef="reportsExecutedGateway">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flowFromCreateReports" sourceRef="createReportsCallActivity" targetRef="reportsExecutedJoin">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_24" sourceRef="prepareJobSummaryActivity" targetRef="jobCompleteEnd">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="parallelSequenceFlowToScanAssets" sourceRef="parallelGatewayScanAndLoadOperationalData" targetRef="scanAssetsCallActivity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="parallelSequenceFlowToLoadOperational" sourceRef="parallelGatewayScanAndLoadOperationalData" targetRef="loadingOperationalDataActvity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flowToRetrievingJobData" sourceRef="joinParallelGateway" targetRef="retrievingJobDataActivity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_29" name="successCount &gt; 0" sourceRef="successCountGateway" targetRef="reportCountGateway">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${successCount > 0}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="noSuccessCountFlow" name="successCount &lt;= 0" sourceRef="successCountGateway" targetRef="successCountJoin">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${successCount <= 0}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowToPrepareJobSummary" sourceRef="successCountJoin" targetRef="prepareJobSummaryActivity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="reportsToExecutTrue" name="reportCount &gt; 0" sourceRef="reportCountGateway" targetRef="executeReportsCallActivity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reportCount > 0}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="reportsToExecutFalse" name="no reports" sourceRef="reportCountGateway" targetRef="reportCountJoin">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reportCount <= 0}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_39" sourceRef="reportCountJoin" targetRef="successCountJoin">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="executionsSuccessfulFlow" name="Executions Sucessful" sourceRef="reportsExecutedGateway" targetRef="createReportsCallActivity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reportsExecuted > 0}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="noReportExecutionsFlow" name="No executions" sourceRef="reportsExecutedGateway" targetRef="reportsExecutedJoin">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        <design:labelrotation><![CDATA[0]]></design:labelrotation>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reportExecutionCount <= 0}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="bpmnSequenceFlow_44" sourceRef="reportsExecutedJoin" targetRef="reportCountJoin">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flowToLoadJobProperties" sourceRef="auditWorkflowStart" targetRef="loadJobPropertiesActivity">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_dbpAssetMainWorkflow">
+    <bpmndi:BPMNPlane bpmnElement="dbpAssetMainWorkflow" id="BPMNPlane_dbpAssetMainWorkflow">
+      <bpmndi:BPMNShape bpmnElement="auditPreCheckCallActivity" id="BPMNShape_auditPreCheckCallActivity">
+        <omgdc:Bounds height="78.0" width="136.0" x="630.0" y="233.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="loadJobPropertiesActivity" id="BPMNShape_loadJobPropertiesActivity">
+        <omgdc:Bounds height="75.0" width="141.0" x="397.0" y="234.75"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="collectOperationalDataActivity" id="BPMNShape_collectOperationalDataActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="828.0" y="232.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scanAssetsCallActivity" id="BPMNShape_scanAssetsCallActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="1102.0" y="232.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="loadingOperationalDataActvity" id="BPMNShape_loadingOperationalDataActvity">
+        <omgdc:Bounds height="80.0" width="100.0" x="1102.0" y="392.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="retrievingJobDataActivity" id="BPMNShape_retrievingJobDataActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="1365.0" y="232.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="loadingJobDataActivity" id="BPMNShape_loadingJobDataActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="1524.0" y="232.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="executeReportsCallActivity" id="BPMNShape_executeReportsCallActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="2020.0" y="232.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="createReportsCallActivity" id="BPMNShape_createReportsCallActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="2379.734393968771" y="232.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="prepareJobSummaryActivity" id="BPMNShape_prepareJobSummaryActivity">
+        <omgdc:Bounds height="80.0" width="100.0" x="2783.734393968771" y="232.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelGatewayScanAndLoadOperationalData" id="BPMNShape_parallelGatewayScanAndLoadOperationalData">
+        <omgdc:Bounds height="40.0" width="40.0" x="989.8558966747769" y="252.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="joinParallelGateway" id="BPMNShape_joinParallelGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="1260.855896674777" y="252.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="successCountGateway" id="BPMNShape_successCountGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="1677.0" y="252.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="successCountJoin" id="BPMNShape_successCountJoin">
+        <omgdc:Bounds height="40.0" width="40.0" x="2681.4687879375424" y="252.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="reportCountGateway" id="BPMNShape_reportCountGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="1850.7343939687712" y="252.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="reportCountJoin" id="BPMNShape_reportCountJoin">
+        <omgdc:Bounds height="40.0" width="40.0" x="2614.4687879375424" y="252.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="reportsExecutedGateway" id="BPMNShape_reportsExecutedGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="2190.734393968771" y="252.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="reportsExecutedJoin" id="BPMNShape_reportsExecutedJoin">
+        <omgdc:Bounds height="40.0" width="40.0" x="2539.4687879375424" y="252.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="auditWorkflowStart" id="BPMNShape_auditWorkflowStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="314.0" y="257.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="jobCompleteEnd" id="BPMNShape_jobCompleteEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="2936.734393968771" y="258.25"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="loadingOperationlToJoinFlow" id="BPMNEdge_loadingOperationlToJoinFlow" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="1202.0" y="432.25"></omgdi:waypoint>
+        <omgdi:waypoint x="1280.855896674777" y="432.25"></omgdi:waypoint>
+        <omgdi:waypoint x="1280.855896674777" y="292.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_44" id="BPMNEdge_bpmnSequenceFlow_44" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="2579.4687879375424" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="2614.4687879375424" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="parallelSequenceFlowToScanAssets" id="BPMNEdge_parallelSequenceFlowToScanAssets" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="1029.855896674777" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="1102.0" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToRetrievingJobData" id="BPMNEdge_flowToRetrievingJobData" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="1300.855896674777" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="1365.0" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_24" id="BPMNEdge_bpmnSequenceFlow_24" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="2883.734393968771" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="2936.734393968771" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_39" id="BPMNEdge_bpmnSequenceFlow_39" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="2654.4687879375424" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="2681.4687879375424" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="noReportExecutionsFlow" id="BPMNEdge_noReportExecutionsFlow" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="2210.734393968771" y="292.25"></omgdi:waypoint>
+        <omgdi:waypoint x="2210.734393968771" y="361.48925738818525"></omgdi:waypoint>
+        <omgdi:waypoint x="2559.4687879375424" y="361.48925738818525"></omgdi:waypoint>
+        <omgdi:waypoint x="2559.4687879375424" y="292.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowFromExecutReports" id="BPMNEdge_flowFromExecutReports" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="2120.0" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="2190.734393968771" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToLoadJobProperties" id="BPMNEdge_flowToLoadJobProperties" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="71.0" flowable:targetDockerY="38.0">
+        <omgdi:waypoint x="344.0" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="370.5" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="370.5" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="397.0" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToLoadingJobData" id="BPMNEdge_flowToLoadingJobData" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="1465.0" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="1524.0" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_18" id="BPMNEdge_bpmnSequenceFlow_18" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="1624.0" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="1677.0" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_29" id="BPMNEdge_bpmnSequenceFlow_29" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="1717.0" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="1850.7343939687712" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="reportsToExecutTrue" id="BPMNEdge_reportsToExecutTrue" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="1890.7343939687712" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="2020.0" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowFromCreateReports" id="BPMNEdge_flowFromCreateReports" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="2479.734393968771" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="2539.4687879375424" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToCollectOperationalData" id="BPMNEdge_flowToCollectOperationalData" flowable:sourceDockerX="68.0" flowable:sourceDockerY="39.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="766.0" y="272.3988095238095"></omgdi:waypoint>
+        <omgdi:waypoint x="828.0" y="272.32440476190476"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToAuditPreCheck" id="BPMNEdge_flowToAuditPreCheck" flowable:sourceDockerX="71.0" flowable:sourceDockerY="38.0" flowable:targetDockerX="68.0" flowable:targetDockerY="39.0">
+        <omgdi:waypoint x="538.0" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="584.0" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="584.0" y="272.5"></omgdi:waypoint>
+        <omgdi:waypoint x="630.0" y="272.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="scanAssetToJoinFlow" id="BPMNEdge_scanAssetToJoinFlow" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="1202.0" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="1260.855896674777" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="executionsSuccessfulFlow" id="BPMNEdge_executionsSuccessfulFlow" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="2230.734393968771" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="2379.734393968771" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToScanAssets" id="BPMNEdge_flowToScanAssets" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="928.0" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="989.8558966747769" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToPrepareJobSummary" id="BPMNEdge_flowToPrepareJobSummary" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="2721.4687879375424" y="272.25"></omgdi:waypoint>
+        <omgdi:waypoint x="2783.734393968771" y="272.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="noSuccessCountFlow" id="BPMNEdge_noSuccessCountFlow" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="1697.0" y="292.25"></omgdi:waypoint>
+        <omgdi:waypoint x="1697.0" y="504.48925738818525"></omgdi:waypoint>
+        <omgdi:waypoint x="2701.4687879375424" y="504.48925738818525"></omgdi:waypoint>
+        <omgdi:waypoint x="2701.4687879375424" y="292.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="reportsToExecutFalse" id="BPMNEdge_reportsToExecutFalse" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="1870.7343939687712" y="292.25"></omgdi:waypoint>
+        <omgdi:waypoint x="1870.7343939687712" y="433.48925738818525"></omgdi:waypoint>
+        <omgdi:waypoint x="2634.4687879375424" y="433.48925738818525"></omgdi:waypoint>
+        <omgdi:waypoint x="2634.4687879375424" y="292.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="parallelSequenceFlowToLoadOperational" id="BPMNEdge_parallelSequenceFlowToLoadOperational" flowable:sourceDockerX="20.0" flowable:sourceDockerY="20.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="1009.8558966747769" y="292.25"></omgdi:waypoint>
+        <omgdi:waypoint x="1009.8558966747769" y="432.25"></omgdi:waypoint>
+        <omgdi:waypoint x="1102.0" y="432.25"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

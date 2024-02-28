@@ -15,8 +15,11 @@
  */
 package com.trustwave.dbpworkflow.analytics;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
+
+import com.trustwave.dbpworkflow.task.BaseAction;
 
 /**
  * -- TODO add description here
@@ -28,8 +31,15 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class SubmitReportAction implements JavaDelegate {
+public class SubmitReportAction extends BaseAction implements JavaDelegate {
+    protected Expression reportConfiguration;
+
     public void execute(DelegateExecution execution) {
-        System.out.println("SubmitReportAction Action");
+        super.execute(execution);
+    }
+
+    @Override
+    protected String getActionName() {
+        return this.getClass().getSimpleName();
     }
 }

@@ -28,8 +28,15 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class JobAction implements JavaDelegate {
+public class JobAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
+        super.execute(execution);
         System.out.println("JobAction Action");
     }
+
+    @Override
+    protected String getActionName() {
+       return this.getClass().getSimpleName();
+    }
+
 }

@@ -15,8 +15,11 @@
  */
 package com.trustwave.dbpworkflow.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.flowable.engine.HistoryService;
@@ -24,7 +27,12 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
+import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntityImpl;
+import org.flowable.engine.runtime.ActivityInstance;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +62,41 @@ public class DemoWorkflowServiceImpl implements DemoWorkflowService {
     @Autowired
     private TaskService taskService;
 
+    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
+
+    @Override
+    public String sendRetry(String processInstanceId, String executionId) {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+
+        if (processInstance == null) {
+            return "<html><body>Process instance is no longer active</body></html>";
+        }
+
+        List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstanceId);
+
+        if (activeActivityIds.isEmpty()) {
+            return "<html><body>No active message found</body></html>";
+        }
+
+        String messageName = "eventResponseReceivedEvent";
+        Execution execution = runtimeService
+                .createExecutionQuery()
+                .messageEventSubscriptionName(messageName)
+                .executionId(executionId)
+                .singleResult();
+
+        if (execution == null) {
+            return "<html><body>No such executionId: "+executionId+"</body></html>";
+        }
+        else {
+            runtimeService.setVariable(executionId, "retry", Boolean.TRUE);
+            runtimeService.messageEventReceived(messageName, executionId);
+        }
+
+        return "<html><body>Successful message to "+executionId+"</body></html>";
+    }
 
     @Override
     public String getHistory(String processInstanceId) {
@@ -65,7 +108,9 @@ public class DemoWorkflowServiceImpl implements DemoWorkflowService {
                 .processInstanceId(processInstanceId)
                 .singleResult();
 
-        printprocessInstanceDetails(htmlOutput, historicProcessInstance);
+        printProcessStatus(htmlOutput, processInstanceId, historicProcessInstance);
+
+        printProcessInstanceDetails(htmlOutput, historicProcessInstance);
 
         // Retrieve historic activity instances
         List<HistoricActivityInstance> activityInstances = historyService
@@ -121,8 +166,8 @@ public class DemoWorkflowServiceImpl implements DemoWorkflowService {
     }
 
     private void printActivityInstances(String processInstanceId, List<HistoricActivityInstance> activityInstances,
-            StringBuilder htmlOutput,
-            String prefix) {
+            StringBuilder htmlOutput, String prefix) {
+
         if (!activityInstances.isEmpty()) {
             for (HistoricActivityInstance activityInstance : activityInstances) {
                 printActivityInstanceRow(processInstanceId, activityInstance, htmlOutput, prefix);
@@ -151,23 +196,51 @@ public class DemoWorkflowServiceImpl implements DemoWorkflowService {
         activityDisplay = switch(activityInstance.getActivityType()) {
             case "startEvent", "serviceTask", "endEvent", "receiveTask" -> "<strong>"+activityDisplay+" </strong>";
             case "callActivity" -> "<em><strong>"+activityDisplay+"</strong></em> (call-out)";
-            case "sequenceFlow" -> activityDisplay +" flows to " + getTargetActivityId(processInstanceId, activityInstance.getActivityId() );
+            case "sequenceFlow" -> activityDisplay;
             default -> activityDisplay;
         };
 
         htmlOutput.append("<td style='padding: 5px;'>" + prefix + activityDisplay + "</td>");
 
+        // Create a HistoricDetailQuery
+        // This will only exist if the HistoryLevel is 'FULL'
+        List<HistoricDetail> list = historyService.createHistoricDetailQuery()
+                .activityInstanceId(activityInstance.getId())
+                .variableUpdates()
+                .list();
+
+        // Retrieve the list of HistoricDetail (variable updates)
+
         // Calculate and display the duration in milliseconds
-        long duration = activityInstance.getDurationInMillis();
+        Long duration = activityInstance.getDurationInMillis();
 
         htmlOutput.append("<td style='padding: 5px;'>" + duration + "</td>");
         htmlOutput.append("<td style='padding: 5px;'>" + activityInstance.getActivityType() + "</td>");
         htmlOutput.append("<td style='padding: 5px;'>" + activityInstance.getActivityId() + "</td>");
 
-        htmlOutput.append("<td style='padding: 5px;'>" + activityInstance.getStartTime() + "</td>");
-        htmlOutput.append("<td style='padding: 5px;'>" + activityInstance.getEndTime() + "</td>");
+        final Date startTime = activityInstance.getStartTime();
+        final String formattedStartDate = startTime == null ? "--:--" : dateFormat.format(startTime);
+        final Date endTime = activityInstance.getEndTime();
+        final String formattedEndDate = endTime == null ? "--:--" : dateFormat.format(endTime);
+
+        htmlOutput.append("<td style='padding: 5px;'>" + formattedStartDate + "</td>");
+        htmlOutput.append("<td style='padding: 5px;'>" + formattedEndDate + "</td>");
+        htmlOutput.append("<td style='padding: 5px;'>");
+        htmlOutput.append(list.stream()
+                .map(d -> (HistoricDetailVariableInstanceUpdateEntityImpl) d)
+                .map(this::fromTo)
+                .collect(Collectors.joining(", ")));
+        htmlOutput.append("</td>");
 
         htmlOutput.append("</tr>");
+    }
+
+    private String fromTo(HistoricDetailVariableInstanceUpdateEntityImpl m) {
+        String name = m.getName();
+        String from = ""+m.getCachedValue();
+        String to = ""+m.getValue();
+
+        return String.format("<strong>%s</strong>: from[%s] to [%s]", name, from, to);
     }
 
     private void finishTable(StringBuilder htmlOutput) {
@@ -184,20 +257,68 @@ public class DemoWorkflowServiceImpl implements DemoWorkflowService {
                 "<th style='padding: 5px;'>Id</th>" +
                 "<th style='padding: 5px;'>Start Time</th>" +
                 "<th style='padding: 5px;'>End Time</th>" +
+                "<th style='padding: 5px;'>Variables Changed</th>" +
                 "</tr>"
         );
     }
 
-    private void printprocessInstanceDetails(StringBuilder htmlOutput, HistoricProcessInstance historicProcessInstance) {
+    private void printProcessInstanceDetails(StringBuilder htmlOutput, HistoricProcessInstance historicProcessInstance) {
         if (historicProcessInstance != null) {
             htmlOutput.append("<h2>Process Instance Details</h2>");
             htmlOutput.append("<ul>");
             htmlOutput.append("<li>Process Instance ID: " + historicProcessInstance.getId());
+            htmlOutput.append("<li>Process Definition Name: " + historicProcessInstance.getProcessDefinitionName());
             htmlOutput.append("<li>Process Business Key: " + historicProcessInstance.getBusinessKey());
             htmlOutput.append("<li>Start Time: " + historicProcessInstance.getStartTime());
             htmlOutput.append("<li>End Time: " + historicProcessInstance.getEndTime());
+            htmlOutput.append("<li>Duration (ms): " + historicProcessInstance.getDurationInMillis());
             htmlOutput.append("</ul>");
         }
+    }
+
+    private void printProcessStatus(StringBuilder htmlOutput, String processInstanceId,
+            HistoricProcessInstance historicProcessInstance) {
+        final ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+            htmlOutput.append("<h2>Process Instance Status</h2>");
+            htmlOutput.append("<strong>");
+
+        String status = "unknown";
+        if (processInstance != null) {
+            List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstanceId);
+            htmlOutput.append("<h3>Active Tasks</h3>");
+            htmlOutput.append("<ul>");
+            activeActivityIds.forEach( a -> {
+                final ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery()
+                        .activityId(a)
+                        .unfinished()
+                        .singleResult();
+                final String activityName = activityInstance.getActivityName();
+                htmlOutput.append("<li>");
+                htmlOutput.append(activityName);
+                htmlOutput.append("</li>");
+            });
+            htmlOutput.append("</ul>");
+            if (processInstance.isEnded()) {
+                status = "ENDED";
+            }
+            else if (processInstance.isSuspended()) {
+                status = "SUSPENDED";
+            }
+            else {
+                status = "ACTIVE";
+            }
+        }
+        else {
+            if (historicProcessInstance == null) {
+                status = "NOT FOUND";
+            }
+            else {
+                status = "COMPLETED AND FLUSHED";
+            }
+        }
+        htmlOutput.append(status);
+            htmlOutput.append("</strong>");
+            htmlOutput.append("<br>");
     }
 
     @Override

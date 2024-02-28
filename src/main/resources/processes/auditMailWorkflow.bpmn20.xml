@@ -21,7 +21,7 @@
         <design:stencilid><![CDATA[ScriptTask]]></design:stencilid>
         <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
       </extensionElements>
-      <script><![CDATA[System.out.println("The user chose cancel. Cleanup");]]></script>
+      <script>out:println "The user chose cancel. Cleanup" ></script>
     </scriptTask>
     <exclusiveGateway id="retryOrCancelGateway" name="Retry or Cancel?">
       <extensionElements>

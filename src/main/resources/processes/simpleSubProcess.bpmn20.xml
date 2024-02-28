@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-work-process-palette">
+  <process id="simpleSubProcess" name="SimpleSubProcess" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <extensionElements>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:creationdate><![CDATA[2024-02-14T16:50:16.268Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2024-02-15T17:12:26.093Z]]></design:modificationdate>
+    </extensionElements>
+    <subProcess id="nonMultiSubProcess" name="Non Multi Sub Process">
+      <documentation>This is an example of a non-multi sub process</documentation>
+      <extensionElements>
+        <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+        <design:stencilid><![CDATA[ExpandedSubProcess]]></design:stencilid>
+      </extensionElements>
+      <serviceTask id="simpleSubProcessServiceTask" name="Simple SubProcess Service task" flowable:expression="print('Hello:' + ${asset});">
+        <extensionElements>
+          <flowable:includeInHistory><![CDATA[true]]></flowable:includeInHistory>
+          <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </serviceTask>
+      <startEvent id="simpleSubProcessStart" name="Simple SubProcess Start" flowable:initiator="initiator" flowable:formFieldValidation="false">
+        <documentation>Note: In BPMN 2.0, the start and end can be left off in a SubProcess, but in Flowable 7, they MUST be present for the subprocess to work.</documentation>
+        <extensionElements>
+          <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+          <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </startEvent>
+      <endEvent id="simpleSubProcessEnd" name="Simple SubProcess End">
+        <extensionElements>
+          <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </endEvent>
+      <sequenceFlow id="sequenceFlowFromSimpleTask" sourceRef="simpleSubProcessServiceTask" targetRef="simpleSubProcessEnd">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="sequenceFlowToSimpleTask" sourceRef="simpleSubProcessStart" targetRef="simpleSubProcessServiceTask">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+    </subProcess>
+    <startEvent id="simpleStart" name="Simple Start" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="simpleEnd" name="Simple End">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="sequenceFlowFromSimpleSubProcess" sourceRef="nonMultiSubProcess" targetRef="simpleEnd">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlowToSimpleSubProcess" sourceRef="simpleStart" targetRef="nonMultiSubProcess">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_simpleSubProcess">
+    <bpmndi:BPMNPlane bpmnElement="simpleSubProcess" id="BPMNPlane_simpleSubProcess">
+      <bpmndi:BPMNShape bpmnElement="nonMultiSubProcess" id="BPMNShape_nonMultiSubProcess">
+        <omgdc:Bounds height="348.0" width="431.0" x="427.95762307081213" y="82.62084532299673"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="simpleSubProcessServiceTask" id="BPMNShape_simpleSubProcessServiceTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="600.4112795343997" y="216.62084532299673"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="simpleSubProcessStart" id="BPMNShape_simpleSubProcessStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="482.05409042919916" y="245.50491731174543"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="simpleSubProcessEnd" id="BPMNShape_simpleSubProcessEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="771.0118234588418" y="242.62084532299673"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="simpleStart" id="BPMNShape_simpleStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="315.2" y="241.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="simpleEnd" id="BPMNShape_simpleEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="921.2909564041455" y="242.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlowFromSimpleTask" id="BPMNEdge_sequenceFlowFromSimpleTask" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="700.4112795343997" y="256.62084532299673"></omgdi:waypoint>
+        <omgdi:waypoint x="771.0118234588418" y="256.62084532299673"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlowFromSimpleSubProcess" id="BPMNEdge_sequenceFlowFromSimpleSubProcess" flowable:sourceDockerX="216.0" flowable:sourceDockerY="174.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="858.9175537899895" y="256.28751198966336"></omgdi:waypoint>
+        <omgdi:waypoint x="890.1042550970675" y="256.28751198966336"></omgdi:waypoint>
+        <omgdi:waypoint x="890.1042550970675" y="256.0"></omgdi:waypoint>
+        <omgdi:waypoint x="921.2909564041455" y="256.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlowToSimpleTask" id="BPMNEdge_sequenceFlowToSimpleTask" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="512.0492818292071" y="260.12513464082843"></omgdi:waypoint>
+        <omgdi:waypoint x="600.4112795343997" y="257.88719351684773"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlowToSimpleSubProcess" id="BPMNEdge_sequenceFlowToSimpleSubProcess" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="216.0" flowable:targetDockerY="174.0">
+        <omgdi:waypoint x="345.2" y="256.0"></omgdi:waypoint>
+        <omgdi:waypoint x="386.5788115354061" y="256.0"></omgdi:waypoint>
+        <omgdi:waypoint x="386.5788115354061" y="256.28751198966336"></omgdi:waypoint>
+        <omgdi:waypoint x="427.95762307081213" y="256.28751198966336"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -28,16 +28,24 @@ import org.flowable.engine.delegate.JavaDelegate;
  *
  * @author sfreytag
  */
-public class MailAction implements JavaDelegate {
+public class MailAction extends BaseAction implements JavaDelegate {
     public void execute(DelegateExecution execution) {
+        super.execute(execution);
         String processInstanceId = execution.getProcessInstanceId();
         String processInstanceBusinessKey = execution.getProcessInstanceBusinessKey();
         StringBuilder sb = new StringBuilder();
         sb.append("MailAction Action.  ");
-        sb.append("processInstanceId=");
+        sb.append("\n   processInstanceId=");
         sb.append(processInstanceId);
-        sb.append(", processInstanceBusinessKey=");
+        sb.append("\n   processInstanceBusinessKey=");
         sb.append(processInstanceBusinessKey);
+        sb.append("\n   executionId=");
+        sb.append(execution.getId());
         System.out.println(sb.toString());
+    }
+
+    @Override
+    protected String getActionName() {
+        return this.getClass().getSimpleName();
     }
 }

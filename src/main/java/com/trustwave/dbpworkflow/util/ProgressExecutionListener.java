@@ -45,6 +45,7 @@ import org.springframework.stereotype.Service;
 @Service("progressListener")
 public class ProgressExecutionListener implements ExecutionListener {
     public static final String INDENT_STR = "   ";
+    volatile boolean legendPrinted = false;
     @Autowired RuntimeService runtimeService;
 
     @Override
@@ -117,6 +118,23 @@ public class ProgressExecutionListener implements ExecutionListener {
             }
         }
 
+        if (!legendPrinted) {
+            legendPrinted = true;
+            System.out.println("========================================================");
+            System.out.println("Example output text:");
+            System.out.println("---> START:  Process   id:[process id]");
+            System.out.println("---> TAKE:   SequenceFlow   id:[activity id] sourceActivity ==> destinationActivity");
+            System.out.println("---> [0] START: ServiceTask   id:[activity id] ");
+            System.out.println("---> [0] END:   ServiceTask   id:[activity id] ");
+            System.out.println("\nLEGEND\n     ---> - Lines beginning with this notation are an event output.");
+            System.out.println("     TAKE/START/END - the type of event.  TAKE is only used for flows");
+            System.out.println("     [0] - the loop-counter/instance counter in a multi-instance call");
+            System.out.println("     ServiceTask/Process/SequenceFlow - This is the BPMN Activity.");
+            System.out.println("     id:[xxx] - The id of the activity or process in the model.");
+            System.out.println("     optional additional information - depends on the type of activity.");
+            System.out.println("Lines without dashes and starting at the 0th column are output from the activities/flows.");
+            System.out.println("========================================================\n");
+        }
 
         System.out.println(String.format("%s--> %s%-6s %-12s id:[%s] %s", indent, loopCounter, (eventType+":").toUpperCase(), classType, elementId, description ));
     }

@@ -16,5 +16,8 @@ public class DbpWorkflowApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DbpWorkflowApplication.class, args);
+		System.out.println("\nOpen for business!\n");
+		System.out.println("Begin by calling scan: http://localhost:8080/scan");
+		System.out.println("Or for a failing case, by calling scan: http://localhost:8080/scan?assetToFail=asset2");
 	}
 }

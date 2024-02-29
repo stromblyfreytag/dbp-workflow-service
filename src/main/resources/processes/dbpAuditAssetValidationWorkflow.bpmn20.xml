@@ -13,10 +13,10 @@
       </extensionElements>
       <script><![CDATA[println 'Groovy Script: validate asset'
 def asset = execution.getVariable("asset");
-def retry = execution.hasVariable("retry")
-if (!retry && asset.getId() == 'asset2') {
+def assetToFail = execution.getVariable("assetToFail")
+if (asset.getId() == assetToFail) {
   execution.setVariable("failure", true);
-  println '---- Hey all!  asset2 failed to validate'
+  println '---- Hey all! '+assetToFail+ ' failed to validate'
 }
 ]]></script>
     </scriptTask>

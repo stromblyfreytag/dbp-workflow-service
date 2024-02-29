@@ -36,7 +36,5 @@ public interface DemoWorkflowService {
 
     String getHistory(String processInstanceId);
 
-    void startProcess(Scan scan);
-
-    List<Scan> getScans();
+    public String getScans(boolean syncExceptions, String assetToFail);
 }

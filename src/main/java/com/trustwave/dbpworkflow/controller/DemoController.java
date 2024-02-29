@@ -27,14 +27,12 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.trustwave.dbpworkflow.domain.Asset;
-import com.trustwave.dbpworkflow.domain.Scan;
 import com.trustwave.dbpworkflow.service.DemoWorkflowService;
 import com.trustwave.dbpworkflow.util.RecordedExecutionListener;
 
@@ -96,89 +94,8 @@ public class DemoController {
 
     @RequestMapping(value = "/scan", method = RequestMethod.GET)
     public String getScan(@RequestParam(name = "syncExceptions", defaultValue = "false") boolean syncExceptions,
-            @RequestParam(name = "storeResults", defaultValue = "false") boolean storeResults) {
+            @RequestParam(name = "assetToFail", defaultValue = "") String assetToFail) {
 
-        Map<String, Object> processVariables = new HashMap<>();
-        processVariables.put("syncExceptions", syncExceptions);
-        processVariables.put("storeResults", storeResults);
-        processVariables.put("failure", Boolean.FALSE);
-        processVariables.put("bestEffort", Boolean.FALSE);
-
-        List<Asset> assets = new ArrayList<>();
-        assets.add(new Asset(false,"asset1"));
-        assets.add(new Asset(false,"asset2"));
-        processVariables.put("assets", assets);
-        String businessId = UUID.randomUUID().toString();
-
-        List<String> reportConfigurations = new ArrayList<>();
-        reportConfigurations.add("report1");
-        reportConfigurations.add("report2");
-        processVariables.put("reportConfigurations", reportConfigurations);
-//        ProcessInstance pi = runtimeService.startProcessInstanceByKey("auditAssetsWorkflow", businessId, processVariables);
-//        ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", businessId, processVariables);
-//        ProcessInstance pi = runtimeService.startProcessInstanceByKey("scanAssetsSubProcessWorkflow", businessId, processVariables);
-//        ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleCallOut", businessId, processVariables);
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("dbpAssetMainWorkflow", businessId, processVariables);
-
-        // the wait is an artificial task so we can make queries of the instance, if desired
-        // put any queries here
-
-//        Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).activityId("waitTask").singleResult();
-//        runtimeService.trigger(execution.getId());
-        String historyUrl = "http://localhost:8080/history/" + pi.getId();
-        String defName = pi.getProcessDefinitionName();
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html><body>");
-        sb.append("Process instance has completed.");
-        sb.append("<ul><li>");
-        sb.append("Process Definition Name:");
-        sb.append(defName);sb.append("</li><li>Process ID:");
-        sb.append(pi.getId());
-        sb.append("</li></ul>");
-        sb.append("<br>");
-        sb.append("Here are your possible actions:<br>");
-        sb.append("<ul><li>");
-        sb.append("<a href='");
-        sb.append(historyUrl);
-        sb.append("' target='_blank'>Click here for history</a>");
-
-
-        if (!pi.isEnded()) {
-            String messageName = "eventResponseReceivedEvent";
-            final List<Execution> list = runtimeService.createExecutionQuery().messageEventSubscriptionName(messageName).list();
-
-            if (!list.isEmpty()) {
-                list.forEach(m -> {
-                    String msg = String.format("http://localhost:8080/retry/%s/%s", pi.getId(), m.getId() );
-                    sb.append("</li><li>");
-                    sb.append("<a href='");
-                    sb.append(msg);
-                    sb.append("' target='_blank'>Click here for RETRY of execution id: ");
-                    sb.append(m.getId());
-                    sb.append("</a>");
-
-                    msg = String.format("http://localhost:8080/cancel/%s/%s", pi.getId(), m.getId() );
-                    sb.append("</li><li>");
-                    sb.append("<a href='");
-                    sb.append(msg);
-                    sb.append("' target='_blank'>Click here for CANCEL of execution id: ");
-                    sb.append(m.getId());
-                    sb.append("</a>");
-                });
-            }
-        }
-
-        sb.append("</li></ul>");
-        sb.append("</body></html>");
-        return sb.toString();
+        return service.getScans(syncExceptions, assetToFail);
     }
-//    @PostMapping("/scan")
-//    public void scan(@RequestParam Scan scan) {
-//        service.startProcess(scan);
-//    }
-//
-//    @GetMapping("/scans")
-//    public List<Scan> getScans() {
-//        return service.getScans();
-//    }
 }

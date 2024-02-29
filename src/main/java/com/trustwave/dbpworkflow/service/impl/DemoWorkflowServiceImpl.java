@@ -16,17 +16,18 @@
 package com.trustwave.dbpworkflow.service.impl;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntityImpl;
@@ -38,7 +39,7 @@ import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.trustwave.dbpworkflow.domain.Scan;
+import com.trustwave.dbpworkflow.domain.Asset;
 import com.trustwave.dbpworkflow.service.DemoWorkflowService;
 
 /**
@@ -78,6 +79,20 @@ public class DemoWorkflowServiceImpl implements DemoWorkflowService {
         final String successResponse = "<html><body>Successful CANCEL message to "+executionId+"</body></html>";
 
         return sendMessageEventReceived(processInstanceId, executionId, userResponseToRetry, successResponse);
+    }
+
+    @Override
+    public String getScans(boolean syncExceptions, String assetToFail) {
+        String businessId = UUID.randomUUID().toString();
+        Map<String, Object> processVariables = getVariableMap(syncExceptions, assetToFail);
+
+//        ProcessInstance pi = runtimeService.startProcessInstanceByKey("auditAssetsWorkflow", businessId, processVariables);
+//        ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", businessId, processVariables);
+//        ProcessInstance pi = runtimeService.startProcessInstanceByKey("scanAssetsSubProcessWorkflow", businessId, processVariables);
+//        ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleCallOut", businessId, processVariables);
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("dbpAssetMainWorkflow", businessId, processVariables);
+
+        return getProcessInstanceStatus(pi);
     }
 
     private String sendMessageEventReceived(String processInstanceId, String executionId, Boolean userResponseToRetry,
@@ -295,8 +310,8 @@ public class DemoWorkflowServiceImpl implements DemoWorkflowService {
     private void printProcessStatus(StringBuilder htmlOutput, String processInstanceId,
             HistoricProcessInstance historicProcessInstance) {
         final ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-            htmlOutput.append("<h2>Process Instance Status</h2>");
-            htmlOutput.append("<strong>");
+        htmlOutput.append("<h2>Process Instance Status</h2>");
+        htmlOutput.append("<strong>");
 
         String status = "unknown";
         if (processInstance != null) {
@@ -333,67 +348,75 @@ public class DemoWorkflowServiceImpl implements DemoWorkflowService {
             }
         }
         htmlOutput.append(status);
-            htmlOutput.append("</strong>");
-            htmlOutput.append("<br>");
+        htmlOutput.append("</strong>");
+        htmlOutput.append("<br>");
     }
 
-    @Override
-    public void startProcess(Scan scan) {
-        throw new NotImplementedException("not yet implemented");
-//        runtimeService.startProcessInstanceByKey("scan");
+    private String getProcessInstanceStatus(ProcessInstance pi) {
+        String historyUrl = "http://localhost:8080/history/" + pi.getId();
+        String defName = pi.getProcessDefinitionName();
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html><body>");
+        sb.append("Process instance has completed.");
+        sb.append("<ul><li>");
+        sb.append("Process Definition Name:");
+        sb.append(defName);
+        sb.append("</li><li>Process ID:");
+        sb.append(pi.getId());
+        sb.append("</li></ul>");
+        sb.append("<br>");
+        sb.append("Here are your possible actions:<br>");
+        sb.append("<ul><li>");
+        sb.append("<a href='");
+        sb.append(historyUrl);
+        sb.append("' target='_blank'>Click here for history</a>");
+
+        if (!pi.isEnded()) {
+            String messageName = "eventResponseReceivedEvent";
+            final List<Execution> list = runtimeService.createExecutionQuery().messageEventSubscriptionName(messageName).list();
+
+            if (!list.isEmpty()) {
+                list.forEach(m -> {
+                    String msg = String.format("http://localhost:8080/retry/%s/%s", pi.getId(), m.getId() );
+                    sb.append("</li><li>");
+                    sb.append("<a href='");
+                    sb.append(msg);
+                    sb.append("' target='_blank'>Click here for RETRY of execution id: ");
+                    sb.append(m.getId());
+                    sb.append("</a>");
+
+                    msg = String.format("http://localhost:8080/cancel/%s/%s", pi.getId(), m.getId() );
+                    sb.append("</li><li>");
+                    sb.append("<a href='");
+                    sb.append(msg);
+                    sb.append("' target='_blank'>Click here for CANCEL of execution id: ");
+                    sb.append(m.getId());
+                    sb.append("</a>");
+                });
+            }
+        }
+
+        sb.append("</li></ul>");
+        sb.append("</body></html>");
+        return sb.toString();
     }
 
-    @Override
-    public List<Scan> getScans() {
-        throw new NotImplementedException("not yet implemented");
-    }
+    private Map<String, Object> getVariableMap(boolean syncExceptions, String assetToFail) {
+        Map<String, Object> processVariables = new HashMap<>();
+        processVariables.put("syncExceptions", syncExceptions);
+        processVariables.put("assetToFail", assetToFail);
+        processVariables.put("failure", Boolean.FALSE);
+        processVariables.put("bestEffort", Boolean.FALSE);
 
-    public static class HtmlOutput {
-        private StringBuilder sb = new StringBuilder();
+        List<Asset> assets = new ArrayList<>();
+        assets.add(new Asset(false,"asset1"));
+        assets.add(new Asset(false,"asset2"));
+        processVariables.put("assets", assets);
 
-        public HtmlOutput table() {
-            sb.append("<table>");
-            return this;
-        }
-
-        public HtmlOutput endtable() {
-            sb.append("</table>");
-            return this;
-        }
-
-        public HtmlOutput tr() {
-            sb.append("<tr>");
-            return this;
-        }
-
-        public HtmlOutput th(String... hdr) {
-            Arrays.stream(hdr).forEach(s -> sb.append("<th style='padding: 5px;'>"+s+"</th>"));
-            return this;
-        }
-
-        public HtmlOutput td(String s) {
-            sb.append("<td style='padding: 5px;'>" + s + "</td>");
-            return this;
-        }
-    }
-
-    private String getTargetActivityId(String processInstanceId, String sourceActivityId) {
-        // Query for outgoing sequence flows based on the process instance ID and source activity ID
-        HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .activityId(sourceActivityId)
-                .orderByHistoricActivityInstanceEndTime()
-                .desc();
-
-        List<HistoricActivityInstance> outgoingFlows = query.list();
-
-        if (!outgoingFlows.isEmpty()) {
-            // Assuming the first entry is the latest completed instance of the source activity
-            // Retrieve the target activity ID from the sequence flow information
-            return outgoingFlows.get(0).getActivityName();
-        }
-
-        // Default to null if no information is found
-        return "n/a";
+        List<String> reportConfigurations = new ArrayList<>();
+        reportConfigurations.add("report1");
+        reportConfigurations.add("report2");
+        processVariables.put("reportConfigurations", reportConfigurations);
+        return processVariables;
     }
 }

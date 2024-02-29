@@ -19,7 +19,7 @@
         <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
       </extensionElements>
       <script><![CDATA[def asset = execution.getVariable("asset")
-def loopCounter = execution.getVariable("loopConter")
+def loopCounter = execution.getVariable("loopCounter")
 println "Groovy Script: starting to scan an asset: $asset [$loopCounter]"]]></script>
     </scriptTask>
     <callActivity id="assetValidationCallActivity" name="Asset Validation" calledElement="dbpAuditAssetValidationWorkflow" flowable:inheritVariables="true" flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true">

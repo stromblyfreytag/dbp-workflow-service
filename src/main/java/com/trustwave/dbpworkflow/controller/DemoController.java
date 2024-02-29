@@ -15,9 +15,7 @@
  */
 package com.trustwave.dbpworkflow.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,9 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.trustwave.dbpworkflow.domain.Asset;
 import com.trustwave.dbpworkflow.service.DemoWorkflowService;
-import com.trustwave.dbpworkflow.util.RecordedExecutionListener;
 
 /**
  * -- TODO add description here
@@ -63,7 +59,6 @@ public class DemoController {
         processVariables.put("storeResults", storeResults);
         processVariables.put("taskFailed", Boolean.FALSE);
         String businessId = UUID.randomUUID().toString();
-        RecordedExecutionListener.clear();
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("demo", businessId, processVariables);
 
 

@@ -12,7 +12,7 @@ See JIRA https://trustwave.atlassian.net/browse/DBP-4093
 
 <h2>Startup</h2>
 Compile and begin the process, then follow the instructions that are printed after it starts up.  Output should be something like the following:
-<code>Open for business!
-
-Begin by calling scan: http://localhost:8080/scan
-Or for a failing case, by calling scan: http://localhost:8080/scan?assetToFail=asset2</code>
+> Open for business!
+>
+> Begin by calling scan: http://localhost:8080/scan
+> Or for a failing case, by calling scan: http://localhost:8080/scan?assetToFail=asset2</code>

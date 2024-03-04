@@ -14,6 +14,9 @@ To get the source code:
 git clone git@github.com:stromblyfreytag/dbp-workflow-service.git
 ```
 
+## Requirements
+Required: Java 20, springboot 3.1.6, flowable 7.0, maven 3.6.2
+
 
 ## Startup
 Compile and begin the process, then follow the instructions that are printed after it starts up.  Output should be something like the following:
